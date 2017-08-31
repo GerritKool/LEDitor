@@ -1,6 +1,7 @@
 // ==================== Pattern generators ====================
 
-
+var	valGenType = 'gen_0',
+	generatorColor = [[255, 0, 0], [0, 0, 255], [0, 0, 0]];
 
 function generateLedAlert(colRGB1, colRGB2) {
 	var	genFrames = [],
@@ -140,9 +141,9 @@ function generateBreathe(colRGB, colRGB2, colRGB3) {
 		valBreath = 1;
 	for(var fr = 0; fr < col.length; fr ++){
 		var	genFrame = [],
-			cR = Math.floor(col[fr][0] * (valBreath * 0.96 + 0.04)), 
-			cG = Math.floor(col[fr][1] * (valBreath * 0.96 + 0.04)), 
-			cB = Math.floor(col[fr][2] * (valBreath * 0.96 + 0.04)), 
+			cR = Math.floor(col[fr][0] * (valBreath * 0.96 + 0.04)),
+			cG = Math.floor(col[fr][1] * (valBreath * 0.96 + 0.04)),
+			cB = Math.floor(col[fr][2] * (valBreath * 0.96 + 0.04)),
 			genColor = [cR, cG, cB];
 
 			valBreath -= stepValBreath;
@@ -445,7 +446,7 @@ function generateButterfly(colRGB, colRGB2, colRGB3){
 	// for every frame...
 	for(var fr = 0; fr < col.length; fr++){
 		var genFrame = [];
-			
+
 			cycle = Math.floor(fr / nFrame);
 			if(cycle > lastCycle){
 				lastCycle = cycle;
@@ -459,7 +460,7 @@ function generateButterfly(colRGB, colRGB2, colRGB3){
 			var p3 = 18 - Math.round(pixPos), p4 = 18 + Math.round(pixPos);
 
 
-		
+
 		genColor = col[fr];
 		genColor = [Math.round(genColor[0] * levelVal), Math.round(genColor[1] * levelVal), Math.round(genColor[2] * levelVal)];
 
@@ -508,7 +509,7 @@ function generateTriangle(colRGB, colRGB2, colRGB3) {
 	var	genFrames = [],
 		genFrame = [];
 
-	
+
 	var	vCol2 = colRGB2[0] + colRGB2[1] + colRGB2[2],
 		vCol3 = colRGB3[0] + colRGB3[1] + colRGB3[2];
 
@@ -616,7 +617,7 @@ function generateFrontpulse(colRGB, colRGB2, colRGB3) {
 		colpix = [],
 		divR = colRGB[0]/255,
 		divG = colRGB[1]/255,
-		divB = colRGB[2]/255; 
+		divB = colRGB[2]/255;
 
 	if(colRGB2 == undefined){colRGB2 = '';}
 	if(colRGB2[0] == 0 && colRGB2[1] == 0 && colRGB2[2] == 0){colRGB2 = '';}
@@ -663,7 +664,7 @@ function generateFrontpulse(colRGB, colRGB2, colRGB3) {
 			pixShift = 12 / nFrame;
 			pixPos = 0;
 		}
-		
+
 		var xLevel = Math.pow(valLevel, 2);
 		genColor = [Math.round(col[fr][0] * xLevel), Math.round(col[fr][1] * xLevel), Math.round(col[fr][2] * xLevel)];
 
@@ -717,7 +718,7 @@ function generatePulsar(colRGB, colRGB2, colRGB3) {
 			var col = [colRGB]; for(var i = 0; i<24; i++){col.push(colRGB);}
 		} else {// duo flow
 			var col = getColorFlow(48, colRGB, colRGB2);
-		} 
+		}
 	}
 
 	// for every frame...
@@ -728,7 +729,7 @@ function generatePulsar(colRGB, colRGB2, colRGB3) {
 		for(var pixel = 0; pixel < 24; pixel++) {
 			var	genColor = colRGB3.slice(0),
 				px = pixel + 3; if(px > 23){px -= 24;}
-			
+
 			if(fr<12){
 				if(px >= 0 && px <= fr){
 					genColor = col[fr];
@@ -952,7 +953,7 @@ function generateGort(colRGB1, colRGB2, colRGB3) {
 	if(colRGB2 == ''){
 		colRGB2=[255 - colRGB1[0], 255 - colRGB1[1], 255 - colRGB1[2]];
 	}
-	
+
 	// for every frame...
 	for(var fr = 0; fr < 16; fr++){
 		var genFrame = [];
@@ -1009,7 +1010,7 @@ function generateEyes(colRGB1, colRGB2, colRGBring) {
 		} else {
 			var colDiv1 = 0; for(var i = 0; i<3; i++){if(colRGB1[i] > 0){colDiv1++;}}
 			var colDiv2 = 0; for(var i = 0; i<3; i++){if(colRGB2[i] > 0){colDiv2++;}}
-		
+
 			if(colDiv1 == colDiv2){colDiv1 = 1; colDiv2 = 2;} else {colDiv2++;}
 
 			colRGB1 = [Math.round(colRGB1[0]/Math.pow(2, colDiv1)), Math.round(colRGB1[1]/Math.pow(2, colDiv1)), Math.round(colRGB1[2]/Math.pow(2, colDiv1))];
@@ -1038,7 +1039,7 @@ function generateEyes(colRGB1, colRGB2, colRGBring) {
 			if(pixcenter > pixdest){
 				pixcenter -= 1;
 			} else if(pixcenter < pixdest){
-				pixcenter += 1; 
+				pixcenter += 1;
 			} else {pixdest = 0;} // set arrived at the destination
 		} else {
 			if(blinkOn){
@@ -1049,7 +1050,7 @@ function generateEyes(colRGB1, colRGB2, colRGBring) {
 		}
 		// last frames: move to start position
 		if(fr >= nFrame -3){pixdest = 21;}
-		
+
 		// get eye pixels
 		for(var i = 1; i<7; i++){
 			if(Math.floor(i/2)*2 == i){
@@ -1097,22 +1098,22 @@ function getColorFlow(nStep, colFlow1, colFlow2){
 	var	col = [];
 
 	if(colFlow1 == undefined){// full flow
-		var	fStep = 360/nStep,
+		var	fStep = 1/nStep,
 			hue = 0;
 
 		for(var i = 0; i<nStep; i ++){
-			var colRGB = hsvToRgb(Math.round(i * fStep), 100, 100);
-			col.push(colRGB);
-		}
+			var colRGB = hsvToRgb(i * fStep, 1, 1);
+			col.push([Math.round(colRGB[0]), Math.round(colRGB[1]), Math.round(colRGB[2])]);
 
+		}
 	} else {// 2 color flow
-		
+
 		var	cR = colFlow1[0],
 			cG = colFlow1[1],
 			cB = colFlow1[2],
-			stepR = (colFlow2[0] - colFlow1[0]) / (nStep-1) * 2,
-			stepG = (colFlow2[1] - colFlow1[1]) / (nStep-1) * 2,
-			stepB = (colFlow2[2] - colFlow1[2]) / (nStep-1) * 2;
+			stepR = (colFlow2[0] - colFlow1[0]) / (nStep) * 2,
+			stepG = (colFlow2[1] - colFlow1[1]) / (nStep) * 2,
+			stepB = (colFlow2[2] - colFlow1[2]) / (nStep) * 2;
 
 		col.push([Math.round(cR), Math.round(cG), Math.round(cB)]);
 		nStep --;
@@ -1209,9 +1210,9 @@ function runGenerator(genType){
 
 	switch(nColors){
 	case 1:
-		genColInfo1.innerHTML = txt_first_color;
-		genColInfo2.innerHTML = txt_flow_to;
-		genColInfo3.innerHTML = txt_ring_color;
+		genColInfo1.innerHTML = thisApp.text.first_color;
+		genColInfo2.innerHTML = thisApp.text.flow_to;
+		genColInfo3.innerHTML = thisApp.text.ring_color;
 		switch(genName){
 			case 'solid':
 			case 'breathe':
@@ -1221,14 +1222,14 @@ function runGenerator(genType){
 			case 'pulsar':
 				notUsed('frames');
 				break;
-		}	
-		if(generatorCol1.disabled == false && genCol1[0] + genCol1[1] + genCol1[2] == 0 && checkFullFlow.checked == false){checkFullFlow.click();}	
+		}
+		if(generatorCol1.disabled == false && genCol1[0] + genCol1[1] + genCol1[2] == 0 && checkFullFlow.checked == false){checkFullFlow.click();}
 		break;
 
 	case 2:
-		genColInfo1.innerHTML = txt_first_color;
-		genColInfo2.innerHTML = txt_second_color;
-		genColInfo3.innerHTML = txt_ring_color;
+		genColInfo1.innerHTML = thisApp.text.first_color;
+		genColInfo2.innerHTML = thisApp.text.second_color;
+		genColInfo3.innerHTML = thisApp.text.ring_color;
 		switch(genName){
 			case 'ledalert':
 				notUsed('color3');
@@ -1246,9 +1247,9 @@ function runGenerator(genType){
 		break;
 
 	case 3:
-		genColInfo1.innerHTML = txt_first_color;
-		genColInfo2.innerHTML = txt_second_color;
-		genColInfo3.innerHTML = txt_third_color;
+		genColInfo1.innerHTML = thisApp.text.first_color;
+		genColInfo2.innerHTML = thisApp.text.second_color;
+		genColInfo3.innerHTML = thisApp.text.third_color;
 
 		notUsed('fullflow');
 		notUsed('frames');
@@ -1330,14 +1331,14 @@ var generatorParameters = [
 	{generator: 'generateSparkle', options: {fps: 4, tfps: 60, rpm: 2, repeat: 1, colorN: 1, random: true, frames:60}},
 	{generator: 'generateSatellite', options: {fps: 1, tfps: 60, rpm: 10, repeat: 15, colorN: 1, random: true, frames:10}},
 	{generator: 'generateLighthouse', options: {fps: 1, tfps: 60, rpm: 10, repeat: 15, colorN: 1, random: true, frames:10}},
-	{generator: 'generateClockwork', options: {fps: 24, tfps: 60, rpm: 0, repeat: 5, colorN: 1, random: false, frames:24}},
+	{generator: 'generateClockwork', options: {fps: 24, tfps: 48, rpm: 0, repeat: 5, colorN: 1, random: false, frames:24}},
 	{generator: 'generateButterfly', options: {fps: 5, tfps: 60, rpm: 0, repeat: 3, colorN: 1, random: false, frames:15}},
 	{generator: 'generateTriangle', options: {fps: 1, tfps: 60, rpm: 30, repeat: 10, colorN: 3, random: false}},
 	{generator: 'generatePulsetrain', options: {fps: 12, tfps: 60, rpm: 17, repeat: 4, colorN: 1, random: false}},
 	{generator: 'generateFrontpulse', options: {fps: 9, tfps: 60, rpm: 0, repeat: 8, colorN: 1, random: false, frames:12}},
 	{generator: 'generatePulsar', options: {fps: 12, tfps: 60, rpm: 0, repeat: 3, colorN: 1, random: false}},
 	{generator: 'generateOncoming', options: {fps: 12, tfps: 60, rpm: 3, repeat: 5, colorN: 2, random: false}},
-	{generator: 'generateNewtonian', options: {fps: 30, tfps: 60, rpm: 0, repeat: 5, colorN: 2, random: false, frames:60}},
+	{generator: 'generateNewtonian', options: {fps: 29, tfps: 58, rpm: 0, repeat: 5, colorN: 2, random: false, frames:58}},
 	{generator: 'generateScannerFrames', options: {fps: 3, tfps: 60, rpm: 0, repeat: 3, colorN: 2, random: false}},
 	{generator: 'generateGort', options: {fps: 3, tfps: 60, rpm: 0, repeat: 2, colorN: 2, random: false}},
 	{generator: 'generateEyes', options: {fps: 2, tfps: 60, rpm: 0, repeat: 1, colorN: 2, random: false}}
