@@ -3,8 +3,8 @@
 	"name": {
 		"en": "LEDitor"
 	},
-	"version": "0.2.2",
-	"compatibility": "0.x || 1.x",
+	"version": "0.3.0",
+	"compatibility": ">=1.1",
 	"description": {
 		"en": "Create custom LED Ring animations for Homey",
 		"nl": "Maak eigen LED Ring animaties voor Homey"
@@ -32,6 +32,17 @@
 	"permissions": [
 		"homey:manager:ledring"
 	],
+
+	"not_yet_screensavers": [
+	    {
+	        "name": "leditor_1",
+	        "title": {
+	            "en": "LEDitor",
+	            "nl": "LEDitor"
+	        }
+	    }
+	],
+
 	"flow": {
 		"actions": [
 			{

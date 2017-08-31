@@ -1,11 +1,13 @@
-## Create your own custom LED-ring animations.
-* Create any LED Ring animation that you like, up to 200 frames.
+## Create your own custom LED-ring animations for Homey.
+* Use millions of color tones to create any LED Ring animation that you like, up to 200 frames per animation.
 * Use some helpfull tools for fills and rotations.
+* Use generators to create animations with a few mouse clicks.
 * Import frames and colors from any image.
-* Use generators to create basic animations with a few mouse clicks.
 * Save your creations and exchange them with your Homey friends.
 
-NOTE: Homey's screensavers wont work when the animations are active. Take that in consideration in case you are using screensavers for notifications. Homey's built-in animations will pause-and-continue the LEDitor animations.
+NOTE: Homey's screensavers wont work when a LEDitor animation is actived.
+Take that in consideration in case you are using screensavers for notifications.
+Homey's built-in animations will pause a LEDitor animation.
 
 
 The user's pleasure is my reward. People who like to show some extra gratitude can buy me a coffee.
@@ -13,22 +15,36 @@ The user's pleasure is my reward. People who like to show some extra gratitude c
 <input type="hidden" name="cmd" value="_s-xclick">
 <input type="hidden" name="encrypted" value="-----BEGIN PKCS7-----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-----END PKCS7-----
 ">
-<input type="image" src="https://www.paypalobjects.com/en_US/GB/i/btn/btn_donateCC_LG.gif" border="0" name="submit" alt="PayPal â€“ The safer, easier way to pay online!">
+<input type="image" src="https://www.paypalobjects.com/en_US/GB/i/btn/btn_donateCC_LG.gif" border="0" name="submit" alt="PayPal – The safer, easier way to pay online!">
 <img alt="" border="0" src="https://www.paypalobjects.com/nl_NL/i/scr/pixel.gif" width="1" height="1">
 </form>
 
 
 ### Brainwaves that need to be converted to code:
-* Optimize on-screen color display.
-* Create a better, more LED-related color selection.
 * Optimize undo to store not only colors, but parameters also.
 * Make it possible to use animations as (semi) screensavers.
-* Create a special generator with sweeping lines, sine waves, blinking leds and more party stuf.
+* Add flow cards to use individual leds as status indicators / to inform the user.
 * Add flow cards to select a random animation and/or sequence of animations. Preferably with in-card settings.
+* Create a special generator with sweeping lines, sine waves, blinking leds and more party stuf.
 * Think about 'Dummy-TV' function with random selected 'movie light' effects like passing cars by night, zooming and panning colors, incidental flashes, lightning, explosions etc.
 
 
 ## What happened so far...
+### v0.3.0
+Completely reworked color display and color selection to provide a more intuitive operation.
+* New: LED/light related display of colors.
+* New: Palette expanded from 285 to 475 color tones. 19 colors / 25 brightness levels.
+* New: Advanced color selection lets you choose any color you like and save 24 as your personal favorites.
+* New: Pick the color from one LED and use it for further editing.
+* New: Gamma control to match the screen colors to the actual LED Ring colors.
+* New: Show frame changes on LED Ring.
+* Added option: Choose from 3 different types of gradient fills. HSV 1, HSV 2 or RGB. Previous LEDitor version only had RGB-fill.
+* Expanded total number of animations from 30 to 100.
+* Removed bug: Fill-buttons were not always enabled when an animation contained inactive LEDs and 'All frames' was checked.
+* Removed bug: Frames that were imported from images were processed with unwanted color corrections.
+* Various small fixes and user interface updates. The term "Interpolated Frames" has been changed to "Virtual Frames"
+* Code optimizing and rewriting.
+
 ### v0.2.2
 * Removed bug: When accessing flow actions before the settings page was visited, LEDitor would crash.
 * Straightened a few wrinkles in the user interface.
