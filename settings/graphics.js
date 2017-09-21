@@ -4,10 +4,6 @@ var	editW = 400,				// display canvas width/height
 	caseRadius = editW * 0.43,
 	ledW = editW;				// max. radiation radius for leds
 
-canvRing.style.filter = 'blur(7px)';
-canvRing2.style.filter = 'blur(7px)';
-canvColorLed.style.filter = 'blur(8px)';
-
 
 function initTopColor(){
 	var tCol = getTopColor();
@@ -22,6 +18,7 @@ function initTopColor(){
 	inRPM.style.backgroundColor = tCol.b;
 	inRepeat.style.color = tCol.t;
 	inRepeat.style.backgroundColor = tCol.b;
+	colorDirectSelectInfo.style.color = tCol.t;
 	refreshFramesList();
 	if( colorSelectionOn ){ initColorSelection(); }
 	butTopColor.style.transform = 'rotate(' + (topColor * 90) + 'deg)';
@@ -44,7 +41,7 @@ function drawTop(){
 	var grd = ctxTop.createRadialGradient(editW2, editW2, 0, editW2, editW2, caseRadius);
 	grd.addColorStop(0 , 'rgba(' + colDim + ',' + colDim + ',' + colDim + ', 1)');
 	grd.addColorStop(0.9, 'rgba(' + colDim2 + ',' + colDim2 + ',' + colDim2 + ', 1)');
-	grd.addColorStop(1 , 'rgba(' + colDim3 + ',' + colDim3 + ',' + colDim3 + ', 0.8)');
+	grd.addColorStop(1 , 'rgba(' + colDim3 + ',' + colDim3 + ',' + colDim3 + ', 1)');
 	ctxTop.fillStyle = grd;
 	ctxTop.beginPath();
 	ctxTop.arc(editW2, editW2, caseRadius, 0, 2 * Math.PI);

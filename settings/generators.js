@@ -1,7 +1,8 @@
 // ==================== Pattern generators ====================
 
 var	valGenType = 'gen_0',
-	generatorColor = [[255, 0, 0], [0, 0, 255], [0, 0, 0]];
+	generatorColor = [[255, 0, 0], [0, 0, 255], [0, 0, 0]],
+	text_color = {on:'rgba(0,0,0,1)', off:'rgba(0,0,0,0.3)'};
 
 function generateLedAlert(colRGB1, colRGB2) {
 	var	genFrames = [],
@@ -163,29 +164,6 @@ function generateBreathe(colRGB, colRGB2, colRGB3) {
 	return genFrames;
 }
 
-function generateRandomColors() {
-	var genFrames = [];
-
-	// for every frame...
-	for(var fr = 0; fr < 60; fr++){
-		var genFrame = [];
-
-		// for every pixel...
-		for(var pixel = 0; pixel < 24; pixel++) {
-			var genColor = [0, 0, 0];
-			if(Math.floor(pixel/4)*4 == pixel){
-				color = [Math.floor(Math.random()*4)*85 , Math.floor(Math.random()*4)*85 , Math.floor(Math.random()*4)*85];
-				if(color[0] > 0 && genColor[1] > 0 && genColor[2] > 0){
-					color[Math.floor(Math.random()*3)] = 0;
-				}
-			}
-			genFrame.push({r: genColor[0], g: genColor[1], b: genColor[2]});
-		}
-		genFrames.push(genFrame);
-	}
-	return genFrames;
-}
-
 function generateSparkle(colRGB, colRGB2, colRGB3) {
 	var	genFrames = [],
 		nFrame = 30;
@@ -206,35 +184,41 @@ function generateSparkle(colRGB, colRGB2, colRGB3) {
 		var totalFrames = inGenFrame.value;
 	}
 
-	if(colRGB[0] == 0 && colRGB[1] == 0 && colRGB[2] == 0){// full flow
+	if(checkRandomColors.checked){ // random
+		colRGB = [-1, -1, -1];
+		var arrayRandomColors = getRandomColors(totalFrames * 3);
+		var col = []; for(var i = 0; i< totalFrames; i++){col.push(0);}
+		
+		var indexCol = 0;
+	} else if(colRGB[0] == 0 && colRGB[1] == 0 && colRGB[2] == 0){ // full flow
 		var col = getColorFlow(totalFrames);
 	} else {
-		if(colRGB2 == ''){// fixed color
+		if(colRGB2 == ''){ // fixed color
 			var col = []; for(var i = 0; i< totalFrames; i++){col.push(colRGB);}
-		} else {// duo flow
+		} else { // duo flow
 			var col = getColorFlow(totalFrames, colRGB, colRGB2);
 		}
 	}
-	if(checkRandomColors.checked){colRGB = [-1, -1, -1];}
 
 	var genFrames = [];
 	for(var fr = 0; fr < col.length; fr ++){
 		var	genFrame = [],
-			dots = [Math.floor(Math.random() * 8) , Math.floor(Math.random() * 8) , Math.floor(Math.random() * 8)];
+			dots = [Math.floor(Math.random() * 8) , 8 + Math.floor(Math.random() * 8) , 16 + Math.floor(Math.random() * 8)];
 
 		for(var pixel = 0; pixel < 24; pixel++) {
 			var genColor = colRGB3.slice(0);
-			if(pixel == dots[0] || pixel == dots[1] + 8 || pixel == dots[2] + 16){
-				var dat = Math.floor(Math.random() * 255) + 1;
-				for(var i=0; i<3; i++) {
-					if(colRGB[i] >= 0){
-						genColor[i] = Math.round(col[fr][i]/255 * dat);
-					}else{
-						genColor[i] = Math.floor(Math.random() * 4) *85;
-					}
-				}
-				if(colRGB == [-1,-1,-1] && (genColor[0] > 0 && genColor[1] > 0 && genColor[2] > 0)){
-					genColor[Math.floor(Math.random()*3)] = 0;
+			if(pixel == dots[0] || pixel == dots[1] || pixel == dots[2]){
+				var dat = Math.round(Math.random() * 252) + 3;
+				if(colRGB[0] != -1){
+					genColor.forEach(function(item, index){
+						genColor[index] = Math.round(col[fr][index]/255 * dat);
+					});
+				}else{
+					genColor = arrayRandomColors[fr * 3 + indexCol];
+					indexCol++; if(indexCol == 3){indexCol = 0;}
+					genColor.forEach(function(item, index){
+						genColor[index] = Math.round(item/255 * dat);
+					});
 				}
 			}
 			genFrame.push({r: genColor[0], g: genColor[1], b: genColor[2]});
@@ -509,28 +493,31 @@ function generateTriangle(colRGB, colRGB2, colRGB3) {
 	var	genFrames = [],
 		genFrame = [];
 
+	var	colHSV = rgbToHsv(colRGB[0], colRGB[1], colRGB[2]),
+		colHSV2 = rgbToHsv(colRGB2[0], colRGB2[1], colRGB2[2]),
+		colHSV3 = rgbToHsv(colRGB3[0], colRGB3[1], colRGB3[2]);
 
-	var	vCol2 = colRGB2[0] + colRGB2[1] + colRGB2[2],
-		vCol3 = colRGB3[0] + colRGB3[1] + colRGB3[2];
-
-	if(vCol2 == 0){
-		colRGB2=[255 - colRGB[0], 255 - colRGB[1], 255 - colRGB[2]];
-	}
-	if(vCol3 == 0){
-		colRGB3=[colRGB[0] + (colRGB2[0] - colRGB[0])/2, colRGB[1] + (colRGB2[1] - colRGB[1])/2, colRGB[2] + (colRGB2[2] - colRGB[2])/2];
-		var maxVal = 0;
-		colRGB3.forEach(function(index){
-			if(colRGB3[index] > maxVal){maxVal = colRGB3[index];}
-		});
-		if(maxVal > 255){
-			colRGB3[0] = colRGB3[0] * (255 / maxVal);
-			colRGB3[1] = colRGB3[1] * (255 / maxVal);
-			colRGB3[2] = colRGB3[2] * (255 / maxVal);
+	if(colHSV2[2] == 0){
+		if(colHSV3[2] == 0){
+			colHSV2[0] = colHSV[0] + 2/3;
+			colHSV2[1] = colHSV[1];
+			colHSV2[2] = colHSV[2];
+			if(colHSV2[0] > 1){colHSV2[0] -= 1};
+		} else {
+			colHSV2[0] = (colHSV[0] + colHSV3[0]) / 2;
+			colHSV2[1] = (colHSV[1] + colHSV3[1]) / 2;
+			colHSV2[2] = (colHSV[2] + colHSV3[2]) / 2;
 		}
-		colRGB3[0] = Math.round(colRGB3[0]);
-		colRGB3[1] = Math.round(colRGB3[1]);
-		colRGB3[2] = Math.round(colRGB3[2]);
 	}
+
+	if(colHSV3[2] == 0){
+		colHSV3[0] = (colHSV[0] + colHSV2[0]) / 2;
+		colHSV3[1] = (colHSV[1] + colHSV2[1]) / 2;
+		colHSV3[2] = (colHSV[2] + colHSV2[2]) / 2;
+	}
+
+	colRGB2 = hsvToRgb(colHSV2[0], colHSV2[1], colHSV2[2]);
+	colRGB3 = hsvToRgb(colHSV3[0], colHSV3[1], colHSV3[2]);
 
 	// for every pixel...
 	for(var pixel = 0; pixel < 24; pixel += 1) {
@@ -1098,8 +1085,7 @@ function getColorFlow(nStep, colFlow1, colFlow2){
 	var	col = [];
 
 	if(colFlow1 == undefined){// full flow
-		var	fStep = 1/nStep,
-			hue = 0;
+		var	fStep = 1/nStep;
 
 		for(var i = 0; i<nStep; i ++){
 			var colRGB = hsvToRgb(i * fStep, 1, 1);
@@ -1107,47 +1093,27 @@ function getColorFlow(nStep, colFlow1, colFlow2){
 
 		}
 	} else {// 2 color flow
-
-		var	cR = colFlow1[0],
-			cG = colFlow1[1],
-			cB = colFlow1[2],
-			stepR = (colFlow2[0] - colFlow1[0]) / (nStep) * 2,
-			stepG = (colFlow2[1] - colFlow1[1]) / (nStep) * 2,
-			stepB = (colFlow2[2] - colFlow1[2]) / (nStep) * 2;
-
-		col.push([Math.round(cR), Math.round(cG), Math.round(cB)]);
-		nStep --;
-		for(var i = 0; i < nStep; i ++){
-			if(i < (nStep /2)){
-				cR = cR + stepR;
-				cG = cG + stepG;
-				cB = cB + stepB;
-			} else {
-				cR = cR - stepR;
-				cG = cG - stepG;
-				cB = cB - stepB;
-			}
-			col.push([Math.round(cR), Math.round(cG), Math.round(cB)]);
+		var halfStep = Math.round(nStep / 2);
+		var rgbFlow1 = createColorFlow({r:colFlow1[0], g:colFlow1[1], b:colFlow1[2]}, {r:colFlow2[0], g:colFlow2[1], b:colFlow2[2]}, halfStep, dropGenFlowType.value);
+		var rgbFlow2 = createColorFlow({r:colFlow2[0], g:colFlow2[1], b:colFlow2[2]}, {r:colFlow1[0], g:colFlow1[1], b:colFlow1[2]}, halfStep, dropGenFlowType.value);
+		if( nStep == 2 * halfStep){
+			var lenFlow2 = rgbFlow2.length-1;
+		} else {
+			var lenFlow2 = rgbFlow2.length-2;
 		}
+		var rgbFlow = rgbFlow1.slice(0, rgbFlow1.length-1).concat(rgbFlow2.slice(0, lenFlow2));
+		rgbFlow.forEach(function(item, index){
+			col.push([item.r, item.g, item.b]);
+		});
 	}
 	return col;
 }
 
 function getRandomColors(randomFrames){
-	var	col = [],
-		c = [];
-
+	var	col = [];
 	if(randomFrames == undefined){randomFrames = 109;}
-
 	for(var i = 0; i < randomFrames; i++){
-		c = [0, 0, 0];
-		while(c[0] == c[1] && c[1] == c[2]){
-			c[0] = Math.floor(Math.random() * 4)*85;
-			c[1] = Math.floor(Math.random() * 4)*85;
-			c[2] = Math.floor(Math.random() * 4)*85;
-		}
-		if(c[0]>0 && c[1]>0 && c[2]>0){c[Math.floor(Math.random()*3)] = 0;}
-		col.push(c);
+		col.push( hsvToRgb(Math.random(), 0.75 + 0.25 * Math.floor(2 * Math.random()), 1) );
 	}
 	return col;
 }
@@ -1184,30 +1150,39 @@ function runGenerator(genType){
 	}
 
 	checkRandomColors.disabled = false;
-	txtRandomColors.style.color = "#000000";
+	txtRandomColors.style.color = text_color.on;
 	checkFullFlow.disabled = false;
-	txtFullFlow.style.color = "#000000";
+	txtFullFlow.style.color = text_color.on;
+	dropGenFlowType.disabled = false;
+	genFlowType.style.color = text_color.on;
 
 	inGenFrame.disabled = false;
 	inGenFrame.style.backgroundColor = "#ffffff";
-	txtGenFrame.style.color = "#000000";
+	txtGenFrame.style.color = text_color.on;
 
 	generatorCol1.disabled = false;
-	genColInfo1.style.color = "#000000";
+	genColInfo1.style.color = text_color.on;
 	generatorCol2.disabled = false;
-	genColInfo2.style.color = "#000000";
+	genColInfo2.style.color = text_color.on;
 	generatorCol3.disabled = false;
-	genColInfo3.style.color = "#000000";
+	genColInfo3.style.color = text_color.on;
 
 	if((!checkRandomColors.disabled && checkRandomColors.checked) || (!checkFullFlow.disabled && checkFullFlow.checked)){
 		notUsed('color1');
 		notUsed('color2');
+		dropGenFlowType.disabled = true;
+		genFlowType.style.color = text_color.off;
 	}
 
 	if(!doRandom){
 		notUsed('random');
 	}
-
+/*
+	if(!checkFullFlow.disabled && checkFullFlow.checked){
+		dropGenFlowType.disabled = true;
+		genFlowType.style.color = text_color.off;
+	}
+*/
 	switch(nColors){
 	case 1:
 		genColInfo1.innerHTML = thisApp.text.first_color;
@@ -1258,7 +1233,7 @@ function runGenerator(genType){
 	}
 
 	if(!checkFullFlow.disabled && checkFullFlow.checked){
-		genCol1 = [0, 0, 0]
+		genCol1 = [0, 0, 0];
 	}
 
 	switch(genType){
@@ -1281,6 +1256,10 @@ function runGenerator(genType){
 		case 'gen_17': ledFrames = generateGort(genCol1, genCol2, genCol3); break;
 		case 'gen_18': ledFrames = generateEyes(genCol1, genCol2, genCol3); break;
 	}
+	var genTitle = 'generator_'+genType.substr(4);
+	animationIndex[selectedAnimation].name = thisApp.text['generator_'+genType.substr(4)];
+	refreshAnimationSelection();
+	setSettingAnimationIndex();
 
 	refreshCounter(); refreshCounter(ledFrames.length);
 
@@ -1292,33 +1271,35 @@ function notUsed(notUsedParameter){
 	switch(notUsedParameter){
 	case 'color1':
 		generatorCol1.disabled = true;
-		genColInfo1.style.color = "#aaaaaa";
+		genColInfo1.style.color = text_color.off;
 		break;
 
 	case 'color2':
 		generatorCol2.disabled = true;
-		genColInfo2.style.color = "#aaaaaa";
+		genColInfo2.style.color = text_color.off;
 		break;
 
 	case 'color3':
 		generatorCol3.disabled = true;
-		genColInfo3.style.color = "#aaaaaa";
+		genColInfo3.style.color = text_color.off;
 		break;
 
 	case 'fullflow':
 		checkFullFlow.disabled = true;
-		txtFullFlow.style.color = "#aaaaaa";
+		txtFullFlow.style.color = text_color.off;
+		dropGenFlowType.disabled = true;
+		genFlowType.style.color = text_color.off;
 		break;
 
 	case 'random':
 		checkRandomColors.disabled = true;
-		txtRandomColors.style.color = "#aaaaaa";
+		txtRandomColors.style.color = text_color.off;
 		break;
 
 	case 'frames':
 		inGenFrame.disabled = true;
-		txtGenFrame.style.color = "#aaaaaa";
-		inGenFrame.style.backgroundColor = "#aaaaaa";
+		txtGenFrame.style.color = text_color.off;
+		inGenFrame.style.backgroundColor = text_color.off;
 		break;
 	}
 }

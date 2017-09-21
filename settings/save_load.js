@@ -36,7 +36,7 @@ function storeLeditor() {
 	imgInfo.push(inTFPS.value);
 	imgInfo.push(inRPM.value);
 
-	var aniName = aniIndex[selectedAnimation].name;
+	var aniName = animationIndex[selectedAnimation].name;
 	while(aniName.length <100){aniName += ' ';}
 	for(var i = 0; i < aniName.length; i++){
 		imgInfo.push(aniName.charCodeAt(i));
@@ -58,7 +58,7 @@ function storeLeditor() {
 
 	var dataURL = canvImageExport.toDataURL();
 
-	document.getElementById('imageExport').download = 'LEDitor - ' + aniIndex[selectedAnimation].name;
+	document.getElementById('imageExport').download = 'LEDitor - ' + animationIndex[selectedAnimation].name;
 	document.getElementById('imageExport').href = dataURL;
 	refreshButtons(false);
 }
@@ -135,9 +135,10 @@ function loadLeditor(ev) {
 					aniName += String.fromCharCode(infoData[22 + i]);
 				}
 				aniName = aniName.trim();
-				aniIndex[selectedAnimation] = {name: aniName}
-				storeAniIndex();
-				openAnimationIndex();
+				//animationIndex[selectedAnimation] = {name: aniName};
+				animationIndex[selectedAnimation].name = aniName;
+				setSettingAnimationIndex();
+				refreshAnimationSelection();
 
 				refreshFramesList();
 				refreshLedMarkers();

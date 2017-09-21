@@ -1,152 +1,49 @@
-// ******************** declarations ********************
-var 	blinkInterval = 0,
-	playFrame = 0,
-
-	ctxRing = canvRing.getContext("2d"),				// ring colors
+var 	ctxRing = canvRing.getContext("2d"),				// ring colors
 	ctxRing2 = canvRing2.getContext("2d"),				// ring colors 2
 	ctxTop = canvTop.getContext("2d"),				// Homey's case
+	blinkInterval = 0,
 	valFillType = '',
-	valFillRange = '';
-
-// setup led color markers
-tempCode = '';
-for(var i=0; i<24; i++){
-	var colNr = i+4; if(colNr>24){colNr -=24;}
-	tempCode += ('<div id="ledMarker' + i + '" class="markerLed" onclick="ledMarkerClick(this);" onmouseover="ledMarkerMouseOver(this); showHelp(this, event)" onmouseout="ledMarkerMouseOut(); showHelp(this, event);">' + colNr + '</div>');
-}
-ledMarkers.innerHTML = tempCode; tempCode = null;
-
-parentRing.style.width = editW + 'px';
-parentRing.style.height = editW + 'px';
-divRing.style.width = editW + 'px';
-divRing.style.height = editW + 'px';
-canvRing.width = editW;
-canvRing.height = editW;
-canvRing.style.width = editW + 'px';
-canvRing.style.height = editW + 'px';
-canvRing2.width = editW;
-canvRing2.height = editW;
-canvRing2.style.width = editW + 'px';
-canvRing2.style.height = editW + 'px';
-canvTop.width = editW;
-canvTop.height = editW;
-canvTop.style.width = editW + 'px';
-canvTop.style.height = editW + 'px';
-but_rename_ani.style.backgroundColor = butColorDef;
-but_copy_ani.style.backgroundColor = butColorDef;
-dropAnimation.style.backgroundColor = butColorDef;
-butPlay.style.backgroundColor = butColorDef;
-butPreview.style.backgroundColor = butColorDef;
-dropFillType.style.backgroundColor = butColorDef;
-dropFillRange.style.backgroundColor = butColorDef;
-but_color_acquire.style.backgroundColor = butColorDef;
-
-// create empty frame & fill ledFrame empty
-var emptyFrame = [];
-for(i = 0; i < 24; i++){
-	emptyFrame.push({r:0, g:0, b:0});
-	ledFrame.push({r:0, g:0, b:0});
-}
-ledFrames.push(ledFrame);
-
-refreshButtons(false); // disable buttons
-var fileListEmpty = null;
-
-function onHomeyReady(){
-	Homey.ready();
-	getSettingVersion();
-
-	// collect all html object-ids
-	var	id_index = [],
-		xText = document.getElementById('leditor_ui').innerHTML;
-	xText = xText.replace(/ id =/g, " id="); // replace all ' id =' by ' id='
-	xText = xText.replace(/ id= /g, " id="); // replace all ' id= ' by ' id='
-	var posId = xText.indexOf(' id="');
-	while(posId > -1){
-		var posIdEnd = xText.indexOf('"' , posId + 5);
-		id_index.push( xText.substr(posId + 5, posIdEnd - (posId + 5)) );
-		var posId = xText.indexOf(' id="', posIdEnd + 1);
-	}
-
-	// help index with all ids + extra / multiple help for controls
-	var help_index = id_index.concat ([
-		'but_copy_ani_A', 'but_copy_ani_B',
-		'dropAnimation_A', 'dropAnimation_B',
-		'ledMarker_A', 'ledMarker_B',
-		'dropFillType1', 'dropFillType2', 'dropFillType3', 'dropFillType1ext', 'dropFillType2ext', 'dropFillType3ext',
-		'generatorCol1_flow', 'generatorCol2_flow', 'generatorCol3_flow',
-		'inGenFrame_number', 'inGenFrame_number1',
-		'but_color_select_type0', 'but_color_select_type1', 'ledPrev',
-		'colUser_A', 'colUser_B', 'colPreset'
-	]);
-
-	// copy help_ to thisApp.helpText{}
-	for(var i = 0; i < help_index.length; i ++){
-		var helpID = 'settings.help_' + help_index[i];
-		var hText = __('settings.help_' + help_index[i]);
-		if(helpID == hText){
-			help_index.splice(i, 1);
-			i --;
-		} else {
-			thisApp.helpText[help_index[i]] = hText;
-		}
-	}
-	thisApp.helpText.Default = __('settings.intro');
-	thisApp.helpText.dropAniFlowType =  __('settings.help_dropFlowType');
-	thisApp.helpText.dropAniConnectType =  __('settings.help_dropFlowType');
-	thisApp.helpText.dropEditFlowType =  __('settings.help_dropFlowType');
-	help_index = undefined;
-
-	// set button titles
-	for(var i = 0; i < id_index.length; i ++){
-			var xID = 'settings.title_' + id_index[i];
-			var xText = __('settings.title_' + id_index[i]);
-			if(xID != xText){
-				document.getElementById(id_index[i]).title = xText
-			}
-	}
-
-	// text. variable / multiple times used
-	var text_index = [];
-	for (var key in thisApp.text) {
-		text_index.push(key);
-	}
-	for(var i = 0; i < text_index.length; i ++){
-		xId = text_index[i];
-		thisApp.text[xId] = __('settings.txt_'+xId);
-	}
-
-	thisApp.text.frame_add = __('settings.title_but_frame_add');
-	thisApp.text.frame_copy = __('settings.title_but_frame_copy');
-
-	thisApp.text.drop_type = [];
-	for(var i = 1; i < 4; i ++){
-		thisApp.text.drop_type.push( __('settings.txt_drop_type_' + i) );
-	}
-
-	thisApp.text.drop_range = [];
-	for(var i = 1; i < 4; i ++){
-		thisApp.text.drop_range.push( __('settings.txt_drop_range_t' + i) );
-	}
-
-	thisApp.text.count = [];
-	for(var i = 0; i < 13; i ++){
-		thisApp.text.count.push( __('settings.count' + i) );
-	}
-
-	// info messages.
-	var message_index = [];
-	for (var key in thisApp.message) {
-		message_index.push(key);
-	}
-	for(var i = 0; i < message_index.length; i ++){
-		xId = message_index[i];
-		thisApp.message[xId] = __('settings.message_'+xId);
-	}
-
-	//thisApp.text.ani_copy = __('settings.animation_button_copy');
+	valFillRange = '',
+	valGenFlowType = '',
+	fileListEmpty = null;
 
 
+function setupUI(){
+	createPaletteData();
+	setupAdvancedPresets();
+
+	parentRing.style.width = editW + 'px';
+	parentRing.style.height = editW + 'px';
+	divRing.style.width = editW + 'px';
+	divRing.style.height = editW + 'px';
+	canvRing.width = editW;
+	canvRing.height = editW;
+	canvRing.style.width = editW + 'px';
+	canvRing.style.height = editW + 'px';
+	canvRing2.width = editW;
+	canvRing2.height = editW;
+	canvRing2.style.width = editW + 'px';
+	canvRing2.style.height = editW + 'px';
+	canvTop.width = editW;
+	canvTop.height = editW;
+	canvTop.style.width = editW + 'px';
+	canvTop.style.height = editW + 'px';
+	but_rename_ani.style.backgroundColor = butColorDef;
+	but_copy_ani.style.backgroundColor = butColorDef;
+	dropAnimation.style.backgroundColor = butColorDef;
+	butPlay.style.backgroundColor = butColorDef;
+	butPreview.style.backgroundColor = butColorDef;
+	dropFillType.style.backgroundColor = butColorDef;
+	dropFillRange.style.backgroundColor = butColorDef;
+	but_color_acquire.style.backgroundColor = butColorDef;
+	but_edit_undo.style.backgroundColor = butColorDefOnWhite ;
+	but_edit_redo.style.backgroundColor = butColorDefOnWhite
+
+	canvRing.style.filter = 'blur(7px)';
+	canvRing2.style.filter = 'blur(7px)';
+	canvColorLed.style.filter = 'blur(8px)';
+
+	// color fill selectors
 	var tHSV = thisApp.text.hue.substr(0, 1).toUpperCase() + thisApp.text.saturation.substr(0, 1).toUpperCase() + thisApp.text.brightness.substr(0, 1).toUpperCase();
 	var xDoc = '<option value="hsv1">' + tHSV + ' 1</option>';
 	xDoc += '<option value="hsv2">' + tHSV + ' 2</option>';
@@ -154,27 +51,7 @@ function onHomeyReady(){
 	dropAniFlowType.innerHTML = xDoc;
 	dropAniConnectType.innerHTML = xDoc;
 	dropFlowType.innerHTML = xDoc;
-
-
-	var xDoc = '';
-	xDoc = xDoc + '<option value="gen_0">' + __('settings.txt_generator_0') +'</option>';
-	for(var i=1; i <= 18; i++){
-		xDoc = xDoc + '<option value="gen_' + i + '">' + __('settings.txt_generator_' + i) +'</option>';
-	}
-	dropGenerator.innerHTML = xDoc;
-
-
-
-	ledSelectPreview({r:0, b:0, g:0});
-	getSettingTopColor();
-	getSettingColorSelectType();
-	getSettingScreenGamma();
-	getSettingGammaLink();
-	getSettingControlInfo();
-	getSettingShowHomey();
-	getSettingShowHomeyTime();
-
-	getSettingUserColor();
+	dropGenFlowType.innerHTML = xDoc;
 
 	// setup color selection palette.
 	// color selectors
@@ -239,11 +116,18 @@ function onHomeyReady(){
 	}
 	userColors.innerHTML = xDoc;
 
+	ledSelectPreview({r:0, b:0, g:0});
+
 	initColorSelection();
 	initColorSelection(false);
 
-	openAnimationIndex();
-	openAnimation();
+	// setup led color markers
+	tempCode = '';
+	for(var i=0; i<24; i++){
+		var colNr = i+4; if(colNr>24){colNr -=24;}
+		tempCode += ('<div id="ledMarker' + i + '" class="markerLed" onclick="ledMarkerClick(this);" onmouseover="ledMarkerMouseOver(this); showHelp(this, event)" onmouseout="ledMarkerMouseOut(); showHelp(this, event);">' + colNr + '</div>');
+	}
+	ledMarkers.innerHTML = tempCode; tempCode = null;
 
 	selectEdit({id:'dropFillType', value:'type_1'});
 
@@ -255,10 +139,13 @@ function onHomeyReady(){
 	ctxImp.fillText(__('settings.txt_import_start'), 2, 320);
 
 	fileListEmpty = openLeditor.files;
+
+	refreshButtons(false); // disable buttons
 }
 
 
 // ********** Number controls **********
+
 function changeNumberSetting(obj){
 	var 	xVal = Number(obj.value),
 		vMin = Number(obj.min),
@@ -269,13 +156,15 @@ function changeNumberSetting(obj){
 
 		// ********** Top bar, animation
 		case'inFPS':
-			if(xVal > inTFPS.value){xVal = inTFPS.value;}
+			if(xVal > inTFPS.value){
+				xVal = inTFPS.value;
+			}
 			inFPS.value = xVal;
 			saveAnimation();
-
 			showAnimationTime();
 			prevFramePulse = 0;
 			opacMs = 1 / (1000 / xVal);
+			actionUndo('delayed');
 			break;
 
 		case'inTFPS':
@@ -284,18 +173,20 @@ function changeNumberSetting(obj){
 			}
 			inTFPS.value = xVal;
 			saveAnimation();
+			actionUndo('delayed');
 			break;
 
 		case'inRPM':
 			saveAnimation();
 			rotateMs = xVal * 360 / 60000;
+			actionUndo('delayed');
 			break;
 
 		case'inRepeat':
 			showAnimationTime();
 			break;
 
-		case'inFrames':
+		case'inFrames': // @ image import
 			obj.value = xVal;
 			if(imgImport != null){
 				setupImportArea();
@@ -335,7 +226,7 @@ function changeNumberSetting(obj){
 			break;
 
 		case'settingShowHomeyTime':
-			setSettingShowHomeyTime();
+			setSettingShowOnHomeyTime();
 			break;
 	}
 }
@@ -407,6 +298,14 @@ function selectEdit(obj){
 			actionUndo();
 		}
 		break;
+
+	case 'dropGenFlowType':
+		if(xVal != valGenFlowType){
+			valGenFlowType = xVal;
+			runGenerator('gen_' + (selectedGenerator + 1));
+			actionUndo();
+		}
+		break;
 	}
 }
 
@@ -463,6 +362,7 @@ function clickControl(obj){
 	case 'but_ani_delete':
 		ledFrames = [emptyFrame];
 		refreshFramesList();
+		animationIndex[selectedAnimation].name = thisApp.text.empty_preset + ' ' + (selectedAnimation + 1);
 		actionUndo();
 
 		break;
@@ -626,6 +526,10 @@ function clickControl(obj){
 		}
 		break;
 
+	case 'colorDirectSelect':
+		setSettingDirectSelect();
+		break;
+
 	// ********** image import
 	case 'but_image_import':
 		document.getElementById('imageImporter').style.visibility = 'visible';
@@ -718,7 +622,7 @@ function clickControl(obj){
 		break;
 
 	case 'settingShowHomey':
-		setSettingShowHomey();
+		setSettingShowOnHomey();
 		settingShowHomeyTime.disabled = !settingShowHomey.checked;
 		break;
 
@@ -919,52 +823,185 @@ function refreshButtons(butOn){
 }
 
 // ********** undo/redo
+var timeoutDelayedUndo = null;
 function actionUndo(action){
 	if(action == undefined){action = 'store';}
 
 	switch(action){
-	case 'store':
-		undoPointer ++;
-		undoList[undoPointer] = ledFrames.slice(0);
-		if(undoPointer < undoList.length - 1){
-			undoList.splice(undoPointer+1, undoList.length - undoPointer-1);
-		}
-		saveAnimation();
-		break;
-
 	case 'init':
 		undoPointer = 0;
-		undoList = [ledFrames.slice(0)];
+		undoList = [{
+			frames:ledFrames.slice(0),
+			options:{
+				fps:inFPS.value,
+				tfps:inTFPS.value,
+				rpm:inRPM.value,
+				name:animationIndex[selectedAnimation].name
+			}
+		}];
+		showNumberUndoRedo();
+		break;
+
+	case 'delayed': // like 'store' but with prevention for machine-gun storage.
+			clearTimeout( timeoutDelayedUndo );
+			timeoutDelayedUndo = setTimeout(function(){
+				actionUndo('store');
+			}, 1000);
+		break;
+
+	case 'store':
+		var changeDetected = false;
+
+		// check for changes in animation
+		var chkAni = {
+			frames:ledFrames.slice(0),
+			options:{
+				fps:Number(inFPS.value),
+				tfps:Number(inTFPS.value),
+				rpm:Number(inRPM.value),
+				name:animationIndex[selectedAnimation].name
+			}
+		};
+		var changeDetected = checkAnimationForChanges(chkAni, undoList[undoPointer]);
+
+		// if change detected, add animation to undoList
+		if(changeDetected.frames || changeDetected.options){
+			undoPointer ++;
+			undoList[undoPointer] = {frames:[], options:{fps:1, tfps:60, rpm:0}};
+			undoList[undoPointer].frames = ledFrames.slice(0);
+			undoList[undoPointer].options = {
+				fps:inFPS.value,
+				tfps:inTFPS.value,
+				rpm:inRPM.value,
+				name:animationIndex[selectedAnimation].name
+			}
+
+			if(undoPointer < undoList.length - 1){
+				undoList.splice(undoPointer+1, undoList.length - undoPointer-1);
+			}
+			saveAnimation();
+			refreshAnimationSelection();
+			setSettingAnimationIndex();
+		}
+		showNumberUndoRedo();
 		break;
 
 	case 'undo':
 		if(undoPointer > 0){
 			undoPointer --;
-			ledFrames = undoList[undoPointer].slice(0);
-			if(selectedFrame >= ledFrames.length){selectedFrame = ledFrames.length - 1;}
-			ledFrame = ledFrames[selectedFrame].slice(0);
-			refreshFramesList();
+			var chkAni = {
+				frames:ledFrames,
+				options:{
+					fps:Number(inFPS.value),
+					tfps:Number(inTFPS.value),
+					rpm:Number(inRPM.value),
+					name:animationIndex[selectedAnimation].name
+				}
+			};
+			var changeDetected = checkAnimationForChanges(chkAni, undoList[undoPointer]);
+
+			if(changeDetected.options){
+				inFPS.value = Number(undoList[undoPointer].options.fps);
+				inTFPS.value = Number(undoList[undoPointer].options.tfps);
+				inRPM.value = Number(undoList[undoPointer].options.rpm);
+				animationIndex[selectedAnimation].name = undoList[undoPointer].options.name;
+				refreshAnimationSelection();
+				setSettingAnimationIndex();
+			}
+			if(changeDetected.frames){
+				ledFrames = undoList[undoPointer].frames.slice(0);
+				if(selectedFrame >= ledFrames.length){selectedFrame = ledFrames.length - 1;}
+				ledFrame = ledFrames[selectedFrame].slice(0);
+				refreshFramesList();
+			}
 			refreshCounter();
 			refreshCounter(ledFrames.length);
 		}
+		showNumberUndoRedo();
 		saveAnimation();
 		break;
 
 	case 'redo':
 		if(undoList.length > 0 && undoPointer < undoList.length-1){
 			undoPointer ++;
-			ledFrames = undoList[undoPointer].slice(0);
-			if(selectedFrame >= ledFrames.length){selectedFrame = ledFrames.length - 1;}
-			ledFrame = ledFrames[selectedFrame].slice(0);
-			refreshFramesList();
+			var chkAni = {
+				frames:ledFrames,
+				options:{
+					fps:Number(inFPS.value),
+					tfps:Number(inTFPS.value),
+					rpm:Number(inRPM.value),
+					name:animationIndex[selectedAnimation].name
+				}
+			};
+			var changeDetected = checkAnimationForChanges(chkAni, undoList[undoPointer]);
+
+			if(changeDetected.options){
+				inFPS.value = Number(undoList[undoPointer].options.fps);
+				inTFPS.value = Number(undoList[undoPointer].options.tfps);
+				inRPM.value = Number(undoList[undoPointer].options.rpm);
+				animationIndex[selectedAnimation].name = undoList[undoPointer].options.name;
+				refreshAnimationSelection();
+				setSettingAnimationIndex();
+			}
+			if(changeDetected.frames){
+				ledFrames = undoList[undoPointer].frames.slice(0);
+				if(selectedFrame >= ledFrames.length){selectedFrame = ledFrames.length - 1;}
+				ledFrame = ledFrames[selectedFrame].slice(0);
+				refreshFramesList();
+			}
 			refreshCounter();
 			refreshCounter(ledFrames.length);
 		}
+		showNumberUndoRedo();
 		saveAnimation();
 		break;
 	}
 	showOnHomey(ledFrames[selectedFrame]);
 	refreshButtons();
+}
+
+function showNumberUndoRedo(){
+	nUndo = undoPointer; if(nUndo == 0){nUndo = ''; }
+	nRedo = undoList.length - undoPointer - 1; if(nRedo == 0){nRedo = ''; }
+	numberUndo.innerHTML = '&nbsp;' + nUndo;
+	numberRedo.innerHTML = nRedo + '&nbsp;';
+}
+
+function checkAnimationForChanges(animation_Check, animation_Compare){
+// check if there are changes/differences between animation_Check and animation_Compare
+// animations = {frames:[], options:{fps, tfps, rpm, name} }
+// return = {frames:<bool>, options:<bool>}
+
+	var 	frameChangeDetected = false,
+		optionChangeDetected = false;
+
+	if(animation_Check.options !== undefined && animation_Compare.options !== undefined){
+		if(	Number(animation_Check.options.fps) != Number(animation_Compare.options.fps) ||
+			Number(animation_Check.options.tfps) != Number(animation_Compare.options.tfps) ||
+			Number(animation_Check.options.rpm) != Number(animation_Compare.options.rpm) ||
+			animation_Check.options.name != animation_Compare.options.name
+			){
+			optionChangeDetected = true;
+		}
+	}
+
+	if(animation_Check.frames !== undefined && animation_Compare.frames !== undefined){
+		if( animation_Check.frames.length != animation_Compare.frames.length ){
+			frameChangeDetected = true;
+		} else {
+			animation_Check.frames.forEach(function(item, index){
+				for(var i=0; i < 24; i ++){
+					if(	animation_Check.frames[index][i].r != animation_Compare.frames[index][i].r ||
+						animation_Check.frames[index][i].g != animation_Compare.frames[index][i].g ||
+						animation_Check.frames[index][i].b != animation_Compare.frames[index][i].b
+						){
+						frameChangeDetected = true;
+					}
+				}
+			});
+		}
+	}
+	return { frames:frameChangeDetected, options:optionChangeDetected };
 }
 
 function showMessage( idMessage ){
@@ -981,52 +1018,18 @@ function showMessage( idMessage ){
 }
 
 
-function showOnRing(ledColObj){
-		var	fr = emptyFrame.slice(0),
-			hInv = Number(sliderColorHue.value) - 0.5; if(hInv < 0){hInv += 1;}
-			arrayInv = hsvToRgb(hInv, Number(sliderColorSat.value), Number(sliderColorVal.value));
-			invRGB = {r:Math.round(arrayInv[0]), g:Math.round(arrayInv[1]), b:Math.round(arrayInv[2]) };
-
-		for(var i = 0; i < 5; i++){
-			var xLed = i; if(i < 3){ xLed += 1; }
-			if( i != 2 ){
-				var objPrev = document.getElementById('ledPrev' + xLed);
-				var objVal = objPrev.value;
-			} else {
-				var objVal = 'same';
-			}
-
-			switch(objVal){
-				case'same':
-					var lRGB = {r:ledColObj.r, g:ledColObj.g, b:ledColObj.b};
-					break;
-				case'inv':
-					var lRGB = {r:invRGB.r, g:invRGB.g, b:invRGB.b};
-					break;
-				case'off':
-					var lRGB = {r:0, g:0, b:0};
-					break;
-			}
-			fr[23-i] = lRGB;
-		}
-		showOnHomey(fr);
-}
-
-
 var timeoutShowOnHomey = null;
 function showOnHomey(frame){
 	if(!settingShowHomey.checked){return;}
 
 	clearTimeout( timeoutShowOnHomey );
 	timeoutShowOnHomey = setTimeout(function(){
-		var	aniId = 'leditor_edit',
-			fr = [frame],
-			saveAni = {
+		var	saveAni = {
 				options: { fps: 1, tfps: 60, rpm: 0 },
-				frames	: fr,
+				frames	: [frame],
 				priority: 'INFORMATIVE',
 				duration: (settingShowHomeyTime.value * 1000)
 			};
-		setSettingAnimation(aniId, saveAni);
+		setSettingAnimation('leditor_edit', saveAni);
 	}, 500);
 }

@@ -17,6 +17,8 @@ var 	imgImport = null,
 	imgSelectImportL = 0, imgSelectImportT = 0, imgSelectImportW = 0, imgSelectImportH = 0,
 	importL = 0, importT = 0, importW = 0, importH = 0;
 
+
+
 canvImage.style.left = (2 + 840 - prevSize) + 'px';
 canvImage.style.top = 2 + 'px';
 canvImage.width = prevSize; canvImage.height = prevSize;
@@ -38,23 +40,37 @@ function drawImport(ev) {
 
 	imgImport = new Image();
 	imgImport.onload = function(){
-		imgImportFile = f;
-		imgImportURL = url;
-		imgImportSource = src;
+		imgImport.onload = null;
 
-		sliderZoom.value = 0;
-		imgImportClick = {
-			layerX:0,
-			layerY:0,
-			centerX:Math.round(imgImport.width/2),
-			centerY:Math.round(imgImport.height/2)
+		// create new image.src from original to overcome further [ canvas has been tainted by cross-origin data ]
+		var canvRawImage = document.createElement("canvas");
+		canvRawImage.width = imgImport.width;
+		canvRawImage.height = imgImport.height;
+		var ctxRawImage = canvRawImage.getContext('2d');
+		ctxRawImage.drawImage(imgImport, 0, 0);
+
+		imgImport.onload = function(){ // new image.src created
+			//imgImport.setAttribute('crossOrigin', '');
+			imgImportFile = f;
+			imgImportURL = url;
+			imgImportSource = imgImport.src;
+
+			sliderZoom.value = 0;
+			imgImportClick = {
+				layerX:0,
+				layerY:0,
+				centerX:Math.round(imgImport.width/2),
+				centerY:Math.round(imgImport.height/2)
+			}
+			importL = 0; importT = 0; importW = 0; importH = 0;
+
+			url.revokeObjectURL(imgImport.src);
+			setupImportArea();
+			refreshButtons();
+			refreshImageData();
+			return;
 		}
-		importL = 0; importT = 0; importW = 0; importH = 0;
-
-		setupImportArea();
-		url.revokeObjectURL(src);
-		refreshButtons();
-		refreshImageData();
+		imgImport.src = canvRawImage.toDataURL("image/png");
 		return;
 	}
 	imgImport.src = src;
