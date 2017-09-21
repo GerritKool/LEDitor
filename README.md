@@ -5,9 +5,10 @@
 * Import frames and colors from any image.
 * Save your creations and exchange them with your Homey friends.
 
-NOTE: Homey's screensavers wont work when a LEDitor animation is actived.
-Take that in consideration in case you are using screensavers for notifications.
-Homey's built-in animations will pause a LEDitor animation.
+NOTE 1: The operation of this app may work on some tablets, but it is designed for laptop and desktop PCs. Future versions might get mobile support.
+
+NOTE 2: Homey's screensavers wont work as long as an LEDitor animation is playing. Take that in consideration in case you are using screensavers for notifications.
+Homey's built-in animations will interrupt an LEDitor animation. The LEDitor animation will continue when Homey's animation finished.
 
 
 The user's pleasure is my reward. People who like to show some extra gratitude can buy me a coffee.
@@ -21,15 +22,24 @@ The user's pleasure is my reward. People who like to show some extra gratitude c
 
 
 ### Brainwaves that need to be converted to code:
-* Optimize undo to store not only colors, but parameters also.
-* Make it possible to use animations as (semi) screensavers.
-* Add flow cards to use individual leds as status indicators / to inform the user.
-* Add flow cards to select a random animation and/or sequence of animations. Preferably with in-card settings.
+* Make it possible to use animations as (semi?) screensavers.
+* Add flow cards to use individual leds as status indicators, for example to indicate whether certain people or pets are present.
+* Add flow cards to select a random animation and/or sequence of animations. Preferably with some in-card settings.
+* Make LEDitor resize with Homey Desktop / Browser window.
 * Create a special generator with sweeping lines, sine waves, blinking leds and more party stuf.
 * Think about 'Dummy-TV' function with random selected 'movie light' effects like passing cars by night, zooming and panning colors, incidental flashes, lightning, explosions etc.
 
 
 ## What happened so far...
+### v0.3.1
+* Updated to Homey Apps SDK v2. Homey v1.5.0 or later is required!
+* Optimized Undo/Redo to include FPS, VFPS, RPM and the animation name.
+* Optimized HSB 1 and HSB 2 fills to show two different gradients when color hues are exactly 180 degrees apart (complementary colors).
+* Added gradient type selection (HSB 1, HSB 2, RGB) to the generators.
+* Added setting to select a pallet color, a color preference or a standard color with 1 mouse click.
+* Added some missing control/help information.
+* Various small updates and user interface improvements.
+
 ### v0.3.0
 Completely reworked color display and color selection to provide a more intuitive operation.
 * New: LED/light related display of colors.
@@ -38,7 +48,7 @@ Completely reworked color display and color selection to provide a more intuitiv
 * New: Pick the color from one LED and use it for further editing.
 * New: Gamma control to match the screen colors to the actual LED Ring colors.
 * New: Show frame changes on LED Ring.
-* Added option: Choose from 3 different types of gradient fills. HSV 1, HSV 2 or RGB. Previous LEDitor version only had RGB-fill.
+* Added option: Choose from 3 different types of gradient fills. HSB 1, HSB 2 or RGB. Previous LEDitor version only had RGB-fill.
 * Expanded total number of animations from 30 to 100.
 * Removed bug: Fill-buttons were not always enabled when an animation contained inactive LEDs and 'All frames' was checked.
 * Removed bug: Frames that were imported from images were processed with unwanted color corrections.

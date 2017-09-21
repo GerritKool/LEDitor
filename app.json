@@ -1,14 +1,32 @@
 {
 	"id": "openmindnl.leditor",
+	"version": "0.3.1",
+	"compatibility": "1.x >=1.5.0",
+	"sdk": 2,
 	"name": {
-		"en": "LEDitor"
+		"en": "LEDitor",
+		"nl": "LEDitor"
 	},
-	"version": "0.3.0",
-	"compatibility": ">=1.1",
+	"tags": {
+		"en": [ "LED ring", "animation", "editor" ],
+		"nl": [ "LED ring", "animatie", "editor" ]
+	},
 	"description": {
 		"en": "Create custom LED Ring animations for Homey",
 		"nl": "Maak eigen LED Ring animaties voor Homey"
 	},
+	"category": [
+		"appliances",
+		"lights",
+		"tools"
+	],
+	"images": {
+		"large": "assets/images/large.jpg",
+		"small": "assets/images/small.jpg"
+	},
+	"permissions": [
+		"homey:manager:ledring"
+	],
 	"author": {
 		"name": "Alex van den Berg",
 		"email": "openmind_nl@hotmail.com"
@@ -21,27 +39,6 @@
 			}
 		]
 	},
-	"category": [
-		"appliances",
-		"tools"
-	],
-	"images": {
-		"large": "assets/images/large.jpg",
-		"small": "assets/images/small.jpg"
-	},
-	"permissions": [
-		"homey:manager:ledring"
-	],
-
-	"not_yet_screensavers": [
-	    {
-	        "name": "leditor_1",
-	        "title": {
-	            "en": "LEDitor",
-	            "nl": "LEDitor"
-	        }
-	    }
-	],
 
 	"flow": {
 		"actions": [
@@ -52,13 +49,13 @@
 					"nl": "Speel een animatie"
 				},
 				"hint": {
-					"en": "This card plays an animation for a given number of seconds. 1...3600 = 1 second to 1 hour",
-					"nl": "Dit kaartje speelt een animatie gedurende een op te geven aantal seconden. 1...3600 = 1 seconde tot 1 hour"
+					"en": "This card plays the selected animation for 1...3600 seconds. An already playing LED editor animation will be stopped",
+					"nl": "Dit kaartje speelt de geselecteerde animatie gedurende 1...3600 seconden. Een reeds spelende LEDitor animatie wordt gestopt"
 				},
 				"args": [
 					{
-						"name": "animationSelector",
 						"type": "autocomplete",
+						"name": "animation_selector",
 						"placeholder": {
 							"en": "Animation",
 							"nl": "Animatie"
@@ -79,8 +76,8 @@
 			{
 				"id": "animation_stop",
 				"title": {
-					"en": "Stop een animation",
-					"nl": "Stop een animatie"
+					"en": "Stop animation prematurely",
+					"nl": "Stop de animatie voortijdig"
 				},
 				"hint": {
 					"en": "This card stops an animation and shows the LED-ring screensaver.",
@@ -88,5 +85,16 @@
 				}
 			}
 		]
-	}
+	},
+
+	"not_yet_screensavers": [
+	    {
+	        "name": "leditor_1",
+	        "title": {
+	            "en": "LEDitor",
+	            "nl": "LEDitor"
+	        }
+	    }
+	]
+
 }
