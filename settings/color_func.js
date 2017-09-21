@@ -1,4 +1,3 @@
-
 function adjustRgbGamma(objColRgb){
 //corrected = 255 * (Image/255)^(1/gammaValue)
 	var	cR = 255 * Math.pow((Number(objColRgb.r) / 255), 1/Number(settingGammaR.value)),
@@ -89,7 +88,6 @@ function createColorFlow(colRGB1, colRGB2, nSteps, flowType){
 
 
 
-
 		if(flowType == 'hsv2' && hsv1[0] == hsv2[0]){
 			hsv2[0] -= (1/18 / (hsv2[2] * 84));
 			if(hsv2[0] < 0){hsv2[0] = 1 + hsv2[0];}
@@ -121,6 +119,7 @@ function createColorFlow(colRGB1, colRGB2, nSteps, flowType){
 			} else if(  hueTrack < 0 && hueTrack > -0.5 ){
 				colStepH = (hueTrack + 1) / nSteps;
 			}
+			if( Math.abs(hueTrack) == 0.5 ){ colStepH = -colStepH; }
 			break;
 		}
 
