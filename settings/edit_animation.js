@@ -1,18 +1,26 @@
-var	max_fields = 200,		//maximum frames allowed by Homey
-	count_frames = 0,		//used frames
+var	max_fields = 200,			//maximum frames allowed by Homey
+	count_frames = 0,			//used frames
 	selectedAnimation = 0,
 	selectedFrame = 0,
-	enableAniRename = false,	// Animation rename is enabled?
-	enableAniCopy = false;		// Animation copy is enabled?
+	enableAniRename = false,		// Animation rename is enabled?
+	enableAniCopy = false,			// Animation copy is enabled?
+	timeoutDrawAllFramePreviews = null,	// prevent for multi frame preview drawing
+	playPrevMode = false,			// Animation playing on LED ring?
+	previousFramesLength = 0,		// used to check for animation length changes @ refreshFramesList()
+	previousLedFrames = [],			// used to check for animation frame changes @ drawAllFramePreviews()
+	previousGamma = 0;			// used to check for gamma changes @ drawAllFramePreviews()
 
-function openAnimationIndex(){
-	// get stored animation index
-	getSettingAnimationIndex();
-}
 
-function storeAniIndex(){
-	// store animation index
-	setSettingAnimationIndex();
+
+function refreshAnimationSelection(){
+		// transfer names to options in drop-down and set selection
+		var xOptions = '';
+		animationIndex.forEach(function(item,index){
+			xOptions += '<option value="ani_' + index + '">' + (index+1) + ': ' + animationIndex[index].name + '</option>';
+		});
+
+		dropAnimation.innerHTML = xOptions;
+		dropAnimation.selectedIndex = selectedAnimation;
 }
 
 function clickAniRename(setNewName){
@@ -24,13 +32,14 @@ function clickAniRename(setNewName){
 		dropAnimation.disabled = true;
 		but_rename_ani.style.backgroundColor = '#e0ffe0';
 		inName.style.visibility = 'visible';
-		inName.value = aniIndex[selectedAnimation].name;
+		inName.value = animationIndex[selectedAnimation].name;
 	} else {
 		if(setNewName){
-			aniIndex[selectedAnimation] = {name: inName.value.trim()};
-			storeAniIndex();
+			animationIndex[selectedAnimation] = {name: inName.value.trim()};
+			refreshAnimationSelection();
+			setSettingAnimationIndex();
+			actionUndo();
 		}
-		openAnimationIndex();
 		but_copy_ani.disabled = false;
 		dropAnimation.disabled = false;
 		but_rename_ani.style.backgroundColor = butColorDef;
@@ -71,15 +80,23 @@ function changeAniName(obj){
 function saveAnimation(id){
 	if(id == undefined){
 		id = selectedAnimation;
+		//console.log('...setting to saveAnimation(' + id + ')');
 	}
-	if(id == ''){
-		var xRepeat = inRepeat.value;
+
+	if(id === ''){ // save for preview
+		var	aniId = 'leditor_preview',
+			xRepeat = inRepeat.value;
 	} else {
-		var xRepeat = 1;
+		var	aniId = 'animation' + id,
+			xRepeat = 1;
 	}
-	var	aniId = 'animation' + id,
-		aniDuration = xRepeat * Math.round(1000 * ledFrames.length / inFPS.value),
-		xFPS = Number(inFPS.value), xTFPS = Number(inTFPS.value), xRPM = Number(inRPM.value),
+
+	//console.log('aniId = '+aniId );
+
+	var	aniDuration = xRepeat * Math.round(1000 * ledFrames.length / inFPS.value),
+		xFPS = Number(inFPS.value),
+		xTFPS = Number(inTFPS.value),
+		xRPM = Number(inRPM.value),
 		aniData = {
 			options: {
 				fps	: xFPS, 	// animation frames per second
@@ -108,6 +125,11 @@ function selectAnimation(obj){
 	if(id != selectedAnimation){
 		if(enableAniCopy){
 			openAnimation(id);
+			xCopy = thisApp.text.ani_copy.substr(0, thisApp.text.ani_copy.indexOf(' ')).toLowerCase();
+			animationIndex[selectedAnimation].name = animationIndex[id].name + ' (' + xCopy + ')';
+			saveAnimation();
+			setSettingAnimationIndex();
+			refreshAnimationSelection();
 		} else {
 			selectedAnimation = id;
 			openAnimation();
@@ -177,16 +199,46 @@ function activateSelect(){
 	showOnHomey(ledFrames[selectedFrame]);
 }
 
+function createFramesList(){
+	var tempDoc = '';
+	for(var i = 0; i < 200; i ++){
+		tempDoc = tempDoc + getFrameListRow(i, (thisApp.text.remove + ' frame ' + (i + 1)));
+	}
+	tableFrames.innerHTML = tempDoc;
+}
+
 function refreshFramesList(){
 	divFrameScroll.style.backgroundColor = getTopColor().b;
-	var tempDoc = '';
-	ledFrames.forEach(function(item, index){
-		xFrame = ledFrames[index].slice(0);
-		tempDoc = tempDoc + getFrameListRow(index, getTooltip('frame', index + 1));
-	});
-	tableFrames.innerHTML = tempDoc;
+	if(previousFramesLength != ledFrames.length){
+		var tempDoc = '';
+		ledFrames.forEach(function(item, index){
+			xFrame = ledFrames[index].slice(0);
+			tempDoc = tempDoc + getFrameListRow(index, thisApp.text.remove + ' frame ' + (index + 1));
+		});
+		tableFrames.innerHTML = tempDoc;
+	}
+	previousFramesLength = ledFrames.length;
 	drawAllFramePreviews();
 	activateSelect();
+}
+
+function getFrameListRow(idx, titRemove){
+	var xCol = getTopColor();
+	trLine = '<tr id="frameLine' + idx + '" style="background-color:' + xCol.b + '; color:' + xCol.t + '; border: 1px solid #707070; border-spacing: 0px;" onmouseover="showFrameControls(this);" onmouseout="hideFrameControls(this);" onClick="frameSelect(this);">';
+	trLine += '<td id="frameNum' + idx + '" style="width: 30px; text-align: center; font-size: 12px;">' + (idx+1) + '</td>';
+	trLine += '<td style="width: 264px;"><canvas id="canvPre' + idx + '" width=264 height=20></canvas></td>';
+	trLine += '<td style="width: 5px;"></td>';
+	trLine += '<td style="width: 18px;">';
+	trLine += '<button id="moveUp' + idx + '" style="visibility: hidden; width:18px; height:18px; padding: 0px 0px;" title="' + thisApp.text.move_up + '" onmousedown="clickFrameMove(this);"><img src="../assets/images/frame_up.png" height="16" width="16" style="float: center;"></button>';
+	trLine += '</td>';
+	trLine += '<td style="width: 18px;">';
+	trLine += '<button id="moveDown' + idx + '" style="visibility: hidden; width:18px; height:18px; padding: 0px 0px;" title="' + thisApp.text.move_down + '" onmousedown="clickFrameMove(this);"><img src="../assets/images/frame_down.png" height="16" width="16" style="float: center;"></button>';
+	trLine += '</td>';
+	trLine += '<td style="width: 18px;"></td>';
+	trLine += '<td style="width: 18px;"><button id="rem' + idx + '" style="visibility: hidden; width:18px; height:18px; padding: 0px 0px;" title="' + titRemove + '" onmouseover="this.style.backgroundColor =\'#f44336\';" onmouseout="this.style.backgroundColor=\'#eeeeee\';" onclick="removeFrame(this);"><img src="../assets/images/frame_delete.png" height="16" width="16" style="float: center;"></button></td>';
+	trLine += '<td></td>';
+	trLine += '</tr>';
+	return (trLine);
 }
 
 function refreshFrameNr(nr){
@@ -200,9 +252,9 @@ function drawFramePreview(idx){ // idx = frame nr.
 			ctxPrev = canvPrev.getContext("2d"),
 			colW = canvPrev.width/24,
 			xCol = getTopColor();
-			pos = [], //{x:0, y:0}
+			pos = [],			//{x:0, y:0}
 			ledArray = [],
-			yPos = canvPrev.height * 0.4;
+			yPos = canvPrev.height * 0.4,
 			colH = colW;
 
 		// calc led positions
@@ -212,16 +264,13 @@ function drawFramePreview(idx){ // idx = frame nr.
 		ledFrames[idx].forEach(function(item, index){
 			var xPos = 8 - index;
 			if(xPos < 0){xPos += 24;}
-			xPos = xPos * colW + colW + 1;
+			xPos = xPos * colW + colW;
 			pos.push({x:xPos, y:yPos});
 			ledArray.push(item)
 		});
 
 		ctxPrev.clearRect(0, 0, canvPrev.width, canvPrev.height);
 		drawLedGroup(canvPrev, pos, ledArray, colW * 0.9, 3, 0, canvPrev.height * 0.4 - colH / 2, canvPrev.width, colH);
-
-		// clear around led bar
-		ctxPrev.globalCompositeOperation = 'source-over';
 
 		// draw markers
 		ctxPrev.globalCompositeOperation = 'source-over';
@@ -244,49 +293,39 @@ function drawFramePreview(idx){ // idx = frame nr.
 	}
 }
 
-var timeoutDrawAllFramePreviews = null;
 function drawAllFramePreviews(){
 	clearTimeout(timeoutDrawAllFramePreviews);
 	timeoutDrawAllFramePreviews = setTimeout(function(){
-		for(var i = 0; i < ledFrames.length; i++){
-			drawFramePreview(i);
-		}
+
+		ledFrames.forEach(function(item, index){
+			var frameChanged = false;
+
+			if( previousGamma != (Number(settingGammaR.value) + Number(settingGammaG.value) + Number(settingGammaB.value)) ){
+				frameChanged = true;
+			} else if(!frameChanged && (previousLedFrames.length == ledFrames.length)){
+				for(var i = 0; i < 24; i++ ){
+					if(	item[i].r != previousLedFrames[index][i].r ||
+						item[i].g != previousLedFrames[index][i].g ||
+						item[i].b != previousLedFrames[index][i].b
+					){
+						frameChanged = true;
+					}
+				}
+			} else {
+				frameChanged = true;
+			}
+
+			if(frameChanged){drawFramePreview(index);}
+		});
 		showMessage('');
+		previousLedFrames = ledFrames.slice(0);
+		previousGamma = Number(settingGammaR.value) + Number(settingGammaG.value) + Number(settingGammaB.value);
+			
 	}, 500);
 }
 
-function getTooltip(txt, nr){
-	return (thisApp.text.remove + ' ' + txt + ' ' + nr);
-}
-
-function getFrameListRow(idx, titRemove){
-	var xCol = getTopColor();
-	trLine = '<tr id="frameLine' + idx + '" style="background-color:' + xCol.b + '; color:' + xCol.t + '; border: 1px solid #707070;" onmouseover="showFrameControls(this);" onmouseout="hideFrameControls(this);" onClick="frameSelect(this);">';
-	trLine += '<td style="width: 30px; text-align: center; font-size: 12px;">' + (idx+1) + '</td>';
-	trLine += '<td style="width: 264px;"><canvas id="canvPre' + idx + '" width=264 height=20></canvas></td>';
-	trLine += '<td style="width: 5px;"></td>';
-	trLine += '<td style="width: 18px;">';
-	if(idx > 0){
-		trLine += '<button id="moveUp' + idx + '" style="visibility: hidden; width:18px; height:18px; padding: 0px 0px;" title="' + thisApp.text.move_up + '" onmousedown="clickFrameMove(this);"><img src="../assets/images/frame_up.png" height="16" width="16" style="float: center;"></button>';
-	}
-	trLine += '</td>';
-
-	trLine += '<td style="width: 18px;">';
-	if(idx < ledFrames.length-1){
-		trLine += '<button id="moveDown' + idx + '" style="visibility: hidden; width:18px; height:18px; padding: 0px 0px;" title="' + thisApp.text.move_down + '" onmousedown="clickFrameMove(this);"><img src="../assets/images/frame_down.png" height="16" width="16" style="float: center;"></button>';
-	}
-	trLine += '</td>';
-
-	trLine += '<td style="width: 18px;"></td>';
-	trLine += '<td style="width: 18px;"><button id="rem' + idx + '" style="visibility: hidden; width:18px; height:18px; padding: 0px 0px;" title="' + titRemove + '" onmouseover="this.style.backgroundColor =\'#f44336\';" onmouseout="this.style.backgroundColor=\'#eeeeee\';" onclick="removeFrame(this);"><img src="../assets/images/frame_delete.png" height="16" width="16" style="float: center;"></button></td>';
-
-	trLine += '<td></td>';
-	trLine += '</tr>';
-	return (trLine);
-}
-
 function showFrameControls(obj){
-	if(!playMode){
+	if(!playMode && !generatorOn){
 		xId = Number(obj.id.substr(9));
 		if(xId > 0){document.getElementById('moveUp' + xId).style.visibility = 'visible';}
 		if(xId < ledFrames.length-1){document.getElementById('moveDown' + xId).style.visibility = 'visible';}
@@ -351,45 +390,53 @@ var	playPrevMode = false,
 	previewPlayTimer = null;
 
 function clickPrev(obj){
-	playPrevMode = !playPrevMode;
 
-	if(playPrevMode){	// play preview
+	playPrevMode = !playPrevMode;
+	if(playPrevMode == true){ // start preview
 		showMessage('send_animation');
 		butPreview.innerHTML = '<img src="../assets/images/homey_working.png" height="30" width="30" style="float: center;">';
-		var	tLoad = ledFrames.length * 12, // wait 12ms for each frame to upload.
-			tDuration = Math.ceil(ledFrames.length / inFPS.value * 1000 * inRepeat.value);
 
-		setTimeout(function(){// wait 0.5 sec for icon to change to 'working'.
-			setTimeout(function(){ // wait tLoad for frames to upload.
-				showMessage('');
-				butPreview.innerHTML = '<img src="../assets/images/homey_stop.png" height="30" width="30" style="float: center;">';
+		if(!settingListenerAvailable){ // fix for malfunctioning setSettingListeners()
+			var	tLoad = ledFrames.length * 12, // wait 12ms for each frame to upload.
+				tDuration = Math.ceil(ledFrames.length / inFPS.value * 1000 * inRepeat.value);
+			setTimeout(function(){// wait 0.5 sec for icon to change to 'working'.
+				setTimeout(function(){ // wait tLoad for frames to upload.
+					showMessage('');
+					butPreview.innerHTML = '<img src="../assets/images/homey_stop.png" height="30" width="30" style="float: center;">';
+					previewPlayTimer = setTimeout(function(){ // wait animation duration.
+						clickPrev(butPreview);
+					}, (tDuration));
+				}, (tLoad));
+				saveAnimation('');
+			}, 500);
+		} else {
+			setTimeout(function(){// wait 0.5 sec for icon to change to 'working'.
+				saveAnimation('');
+			}, 500);
+		}
 
-				previewPlayTimer = setTimeout(function(){// wait animation duration.
-					clickPrev(butPreview);
-
-				}, (tDuration));
-			}, (tLoad));
-			saveAnimation('');
-
-		}, 500);
-
-	} else {	// stop preview
+	} else { // stop preview
 		showMessage('');
-		clearTimeout(previewPlayTimer);
+
+		if(!settingListenerAvailable){ // fix for malfunctioning setSettingListeners()
+			clearTimeout(previewPlayTimer);
+		}
+
 		var	frames = [emptyFrame.slice(0)],
 			saveAni = { // create animation with 1 empty frame
 				options: {
-					fps	: 30,
+					fps	: 0,	// 0 fps = stop
 					tfps	: 60,
 					rpm	: 0,
 				},
 				frames	: frames,
 				priority: 'INFORMATIVE',
-				duration: 10	// duration in ms
+				duration: 10
 			}
-
-		setSettingAnimation('animation', saveAni);
-		butPreview.innerHTML = '<img src="../assets/images/homey_play.png" height="30" width="30" style="float: center;">';
+		setSettingAnimation('leditor_preview', saveAni);
+		if(!settingListenerAvailable){ // fix for malfunctioning setSettingListeners()
+			butPreview.innerHTML = '<img src="../assets/images/homey_play.png" height="30" width="30" style="float: center;">';
+		}
 	}
 }
 // ************** END PLAY WITH HOMEY **************
