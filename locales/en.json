@@ -22,7 +22,7 @@
 	"title_but_frame_copy": "Duplicate frame ###",
 	"title_but_ani_fill_flow": "Fill empty frames smoothly. Fixed position",
 	"title_but_ani_fill_connect": "Fill empty frames smoothly. Variable position",
-	"title_but_ani_delete": "Delete all frames",
+	"title_but_ani_delete": "Clear this animation",
 
 	"title_but_ani_generator": "Animation generator",
 	"title_but_generator_close": "Return to editor",
@@ -53,7 +53,7 @@
 
 	"txt_check_all_frames": "All frames",
 
-	
+
 	"frame_count": "Frames",
 	"txt_move_up": "Move up",
 	"txt_move_down": "Move down",
@@ -92,6 +92,7 @@
 	"txt_pure_magenta": "magenta",
 	"txt_pure_cyan": "cyan",
 	"txt_bright_white": "white",
+	"txt_direct_select": "Select directly",
 
 	"count0": "every",
 	"count1": "1st",
@@ -198,6 +199,7 @@
 	"help_but_frame_copy": "Add a copy after the selected frame.",
 	"help_but_ani_fill_flow": "Frames without active LEDs are filled with a gradient composed of the colors of the adjacent frames with active LEDs.",
 	"help_but_ani_fill_connect": "Frames without active LEDs are filled with a gradient composed of the colors of the adjacent frames with active LEDs. The position of the active LEDs in the frame preceding the inactive section will then change to the position of the nearest active LED in the frame following the inactive section.",
+	"help_but_ani_delete": "Remove all frames of this animation and start creating a new animation.",
 	"help_but_image_import": "Use an image as animation source. Animation #1# (#2#) will be replaced by frames that are formed from the pixels of a self-chosen image. Use various settings to adjust the colors. The number of frames is adjustable from 1 to 200.",
 	"help_but_edit_undo": "Undo the last edit. This is possible until you select another animation or leave this settings page.",
 	"help_but_edit_redo": "Redo the undone edit. This is possible until you select another animation or leave this settings page.",
@@ -238,10 +240,12 @@
 	"help_colUser_A": "Select personal color preference #1#.",
 	"help_colUser_B": "Save the set color as personal preference #1#.",
 	"help_colPreset": "Standard color preselection.",
+	"help_colorDirectSelect": "Enable this setting when you want to select a palette color, a personal color preference, or a default color immediately.",
 	"help_but_color_select_accept": "Use the set color for further editing.",
 	"help_but_color_select_cancel": "Leave the color selection without choosing a different color.",
 
 	"help_but_settings": "Open the general LEDitor settings.",
+	"help_but_settings_cancel": "Close the general LEDitor settings.",
 	"help_settingGammaR": "Gamma corrects the display of brightness and colors on the screen to match the colors of the LED Ring. Depending on the screen settings, a useful correction can be expected with a value between 1.5 and 3. Without correction (value 1), brightness and certain colors are not displayed correctly on the screen.",
 	"help_settingGammaLink": "Use the same gamma value for red, green and blue. This will be sufficient in most cases. Turn off the link to set gamma for each main color separately.",
 	"help_settingControlInfo": "At the top of the page, information about the controls is displayed (via text like this). Enable or disable the display of this information.",
