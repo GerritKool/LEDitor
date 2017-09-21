@@ -83,8 +83,6 @@ function setupAdvancedPresets(){
 		xObj.style.color = 'rgb(' + xVal.r + ',' + xVal.g + ',' + xVal.b + ')';
 	}
 }
-createPaletteData();
-setupAdvancedPresets();
 
 
 function redrawPalette(){
@@ -332,6 +330,38 @@ function drawLedColorSelection(){
 }
 
 
+function showOnRing(ledColObj){
+		var	fr = emptyFrame.slice(0),
+			hInv = Number(sliderColorHue.value) - 0.5; if(hInv < 0){hInv += 1;}
+			arrayInv = hsvToRgb(hInv, Number(sliderColorSat.value), Number(sliderColorVal.value));
+			invRGB = {r:Math.round(arrayInv[0]), g:Math.round(arrayInv[1]), b:Math.round(arrayInv[2]) };
+
+		for(var i = 0; i < 5; i++){
+			var xLed = i; if(i < 3){ xLed += 1; }
+			if( i != 2 ){
+				var objPrev = document.getElementById('ledPrev' + xLed);
+				var objVal = objPrev.value;
+			} else {
+				var objVal = 'same';
+			}
+
+			switch(objVal){
+				case'same':
+					var lRGB = {r:ledColObj.r, g:ledColObj.g, b:ledColObj.b};
+					break;
+				case'inv':
+					var lRGB = {r:invRGB.r, g:invRGB.g, b:invRGB.b};
+					break;
+				case'off':
+					var lRGB = {r:0, g:0, b:0};
+					break;
+			}
+			fr[23-i] = lRGB;
+		}
+		showOnHomey(fr);
+}
+
+
 
 
 function initColorPreset(obj){
@@ -362,6 +392,7 @@ function initColorPreset(obj){
 		sliderColorVal.value = colHSV[2];
 		sliderActivate(sliderColorHue);
 	}
+	if(colorDirectSelect.checked){initColorSelection(false,true);}
 }
 
 function initColorSelectType(){
@@ -500,6 +531,7 @@ function clickColorPalette(obj){
 	sliderColorSat.value = colHSV[1];
 	sliderColorVal.value = colHSV[2];
 	drawLedColorSelection();
+	if(colorDirectSelect.checked){initColorSelection(false,true);}
 }
 
 function ledSelectPreview(ledCol, ledText){
