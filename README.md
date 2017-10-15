@@ -1,14 +1,19 @@
 ## Create your own custom LED-ring animations for Homey.
 * Use millions of color tones to create any LED Ring animation that you like, up to 200 frames per animation.
 * Use some helpfull tools for fills and rotations.
-* Use generators to create animations with a few mouse clicks.
+* Use generators to create basic animations with a few mouse clicks.
 * Import frames and colors from any image.
 * Save your creations and exchange them with your Homey friends.
 
 NOTE 1: The operation of this app may work on some tablets, but it is designed for laptop and desktop PCs. Future versions might get mobile support.
 
-NOTE 2: Homey's screensavers wont work as long as an LEDitor animation is playing. Take that in consideration in case you are using screensavers for notifications.
-Homey's built-in animations will interrupt an LEDitor animation. The LEDitor animation will continue when Homey's animation finished.
+NOTE 2: Homey's Desktop Application is very slow  in performing some functions. It also might not render some screens as they should be.
+Urgent advice: Use Google Chrome (or a compatible browser) for the best experience with LEDitor. Just ignore the message that says 'Browsers are not supported'.
+
+NOTE 3: Homey's screensavers wont work as long as a LEDitor animation is playing. Take that in consideration in case you are using screensavers for notifications. You could use LEDitor animations or Homey's built-in animation cards for these notifications. Homey's animation cards will interrupt a LEDitor animation. The LEDitor animation will continue when Homey's animation has finished.
+
+If you think you have found a bug, or maybe you have a great idea, do not hesitate to open an issue at:
+https://github.com/OpenMindNL/LEDitor/issues
 
 
 The user's pleasure is my reward. People who like to show some extra gratitude can buy me a coffee.
@@ -21,16 +26,33 @@ The user's pleasure is my reward. People who like to show some extra gratitude c
 </form>
 
 
-### Brainwaves that need to be converted to code:
+### Brainwaves that still need to be converted to code:
 * Make it possible to use animations as (semi?) screensavers.
 * Add flow cards to use individual leds as status indicators, for example to indicate whether certain people or pets are present.
 * Add flow cards to select a random animation and/or sequence of animations. Preferably with some in-card settings.
-* Make LEDitor resize with Homey Desktop / Browser window.
-* Create a special generator with sweeping lines, sine waves, blinking leds and more party stuf.
-* Think about 'Dummy-TV' function with random selected 'movie light' effects like passing cars by night, zooming and panning colors, incidental flashes, lightning, explosions etc.
+* Combine one or more animations to one. Needs some thinking about settings for stretching to an equal amount of frames, mixing  several colors to one etc.
+* Special generator with sweeping lines, sine waves, blinking leds and more party stuff.
+* Dummy-TV function to mislead potential burglars, with random selected 'movie light' effects like passing cars by night, zooming and panning colors, incidental flashes, lightning, explosions etc.
 
 
 ## What happened so far...
+### v1.0.0
+* New: LEDitor resizes with the browser window. The largest possible square area is assigned to the LED ring / editors on the right. The remaining screen part is used for the frame list, with a minimum width being taken into account.
+* New: Display type selection for the frame list: Color view, LED view or Ring view.
+* New: Randomizer. Changes hue, saturation, brightness and position of active LEDs randomly. The changes are adjustable from very subtle to fully chaotic.
+* Optimized: More realistic neighboring color mix for onscreen LED Ring display.
+* Optimized: Animation name will be set accordingly when using a animation generator, or when importing frames and colors from an image.
+* Optimized Image-import section:
+ * 'View' selection for the imported frames. The 'Ring view' option is a huge help to instantly see how the colors will be displayed on the LED Ring, and to adjust them if necessary.
+ * The clicked preview pixel now becomes the view center when the image is zoomed in. Now it's much easier to select a different area without having to zoom out first.
+ * Info about the image, zoom and scan area is shown in the mouse tooltip.
+* Change: The 'LED Editor' and 'Animation generator' buttons are combined into a popup menu that also contains 'Randomize'.
+* Change: The setting for 'Show control information' has been changed to 'Show header and control information', so when you uncheck it you will have maximum screen space for the editor.
+* Bug removed: 'Direct select' option (at Color selection) was not stored properly.
+* Bug removed: 'Fill empty frames smoothly. Fixed position' with 'HSB 2' gradient could create an invalid animation because of wrong color codes for inactive LEDs.
+* Bug removed: 'Fill empty frames smoothly. Variable position' would sometimes add an extra frame, including a wrong gradient. If this resulted in a total of 201 frames, Homey would not play the animation anymore.
+* Bug removed: 'Fill empty frames smoothly. Variable position'. When start frame and end frame both had only 1 active LED on exact opposite sides, there was only one flow when there should be two flows in opposite directions.
+
 ### v0.3.1
 * Updated to Homey Apps SDK v2. Homey v1.5.0 or later is required!
 * Optimized Undo/Redo to include FPS, VFPS, RPM and the animation name.
