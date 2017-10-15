@@ -1,3 +1,16 @@
+.frameScroll::-webkit-scrollbar {
+	width: 10px;
+}
+ 
+.frameScroll::-webkit-scrollbar-track {
+	-webkit-box-shadow: inset 0 0 4px rgba(10,10,10,0.3);
+}
+ 
+.frameScroll::-webkit-scrollbar-thumb {
+	background-color: rgba(127,127,127, 0.5);
+	outline: 1px solid slategrey;
+}
+
 .markerLed{
 	position:absolute;
 	left:0px;
@@ -45,10 +58,18 @@
 	border:  0px;
 	transform:  rotate(-90deg);
 }
+
 .sliderColor{
 	position: absolute;
 	left: 20px;
 	width: 360px;
+	height: 20px;
+	padding: 0px 0px;
+	border: 0px;
+}
+
+
+.sliderRandomizer{
 	height: 20px;
 	padding: 0px 0px;
 	border: 0px;

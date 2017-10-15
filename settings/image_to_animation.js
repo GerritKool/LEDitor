@@ -2,7 +2,7 @@ var 	imgImport = null,
 	imgImportFile = null,
 	imgImportSource = null,
 	imgImportURL = null,
-	imgImportData,
+	imgImportData = [],
 	scanAspect = 0, // 0 = Left-Right, 1 = Up-Down
 	imgImportClick = {
 		layerX:0,
@@ -11,7 +11,7 @@ var 	imgImport = null,
 		centerY:0
 	},
 	tableEditor = document.getElementById('editor'),
-	prevSize = 396,
+	prevSize = editorWidth - 4,
 	previewL = 0, previewT = 0, previewW = prevSize, previewH = prevSize,
 	imgSelectW = 0, imgSelectH = 0, imgSelectL = 0, imgSelectT = 0,
 	imgSelectImportL = 0, imgSelectImportT = 0, imgSelectImportW = 0, imgSelectImportH = 0,
@@ -19,43 +19,47 @@ var 	imgImport = null,
 
 
 
-canvImage.style.left = (2 + 840 - prevSize) + 'px';
-canvImage.style.top = 2 + 'px';
-canvImage.width = prevSize; canvImage.height = prevSize;
-var ctxImage = canvImage.getContext('2d');
-ctxImage.strokeRect(0, 0, canvImage.width, canvImage.height);
+canvImage.style.left = '446px';
+canvImage.style.top = 0 + 'px';
 
 
 function drawImport(ev) {
-	if(document.getElementById("uploadimage").files[0] == undefined){//canceled
+	showMessage('open_image');
+	if(document.getElementById('uploadimage').files[0] == undefined){//canceled
+		// set data from previous image
 		f = imgImportFile;
 		url = imgImportURL;
 		src = imgImportSource;
+		showMessage('');
 		return;
 	}
 
-	var	f = document.getElementById("uploadimage").files[0],
+	var	f = document.getElementById('uploadimage').files[0],
 		url = window.URL || window.webkitURL,
 		src = url.createObjectURL(f);
+
+
+	sliderLightness.value = -0.125;
+	sliderLightnessVal.innerHTML = -25;
 
 	imgImport = new Image();
 	imgImport.onload = function(){
 		imgImport.onload = null;
 
-		// create new image.src from original to overcome further [ canvas has been tainted by cross-origin data ]
-		var canvRawImage = document.createElement("canvas");
+		// create new image.src from original to overcome [ canvas has been tainted by cross-origin data ]
+		var canvRawImage = document.createElement('canvas');
 		canvRawImage.width = imgImport.width;
 		canvRawImage.height = imgImport.height;
 		var ctxRawImage = canvRawImage.getContext('2d');
 		ctxRawImage.drawImage(imgImport, 0, 0);
 
 		imgImport.onload = function(){ // new image.src created
-			//imgImport.setAttribute('crossOrigin', '');
 			imgImportFile = f;
 			imgImportURL = url;
 			imgImportSource = imgImport.src;
 
 			sliderZoom.value = 0;
+
 			imgImportClick = {
 				layerX:0,
 				layerY:0,
@@ -68,6 +72,7 @@ function drawImport(ev) {
 			setupImportArea();
 			refreshButtons();
 			refreshImageData();
+			showMessage('');
 			return;
 		}
 		imgImport.src = canvRawImage.toDataURL("image/png");
@@ -95,6 +100,7 @@ function setupImportArea(){
 
 	imgSelectW = Math.round(imgImportW * zoomFactor);
 	imgSelectH = Math.round(imgImportH * zoomFactor);
+
 
 	// adapt preview selection to zoom
 	if(imgSelectW > imgSelectH){
@@ -166,7 +172,7 @@ function setupImportArea(){
 	imgImportClick.layerY = Math.round((yCenter - imgSelectT) / (imgSelectH / previewH) + previewT);
 
 	importArea.style.left = (canvImage.offsetLeft + previewL - 2) + 'px';
-	importArea.style.top = (canvImage.offsetTop + previewT - 2) + 'px';
+	importArea.style.top = (canvImage.offsetTop + previewT -2) + 'px';
 	importArea.style.width = importW + 'px';
 	importArea.style.height = importH + 'px';
 
@@ -182,6 +188,7 @@ function setupImportArea(){
 		case 0: imgImportData = ctx.getImageData(0,0,inFrames.value,24); break;
 		case 1: imgImportData = ctx.getImageData(0,0,24,inFrames.value); break;
 	}
+	imgImportTrim();
 
 	// draw led matrix
 	importImageToMatrix();
@@ -224,77 +231,185 @@ function importImageArea(){
 	ctx.drawImage(imgImport, imgSelectImportL, imgSelectImportT, imgSelectImportW, imgSelectImportH, 0, 0, cnvW, cnvH);
 }
 
+timeOutImageToMatrix = null;
 function importImageToMatrix(){
-	// copy imgImportData to matrix area & import area
+	// copy imgImportData to preview area and delayed to LED-matrix area
+
 	if(imgImport == null){return;}
-	var	ctx3 = canvImportedFrames.getContext('2d'),
-		ctxV = canvImportV.getContext('2d'),
-		colorW = 15,
-		colorH = 10,
-		vSpace = 5,
-		colorL = (canvImportedFrames.width - 24 * colorW) / 2;
+	importImageToPreview();
 
-	ctxV.fillStyle = '#000000';
-	ctxV.fillRect(0,0,canvImportV.width, canvImportV.height);
-	canvImportedFrames.height = inFrames.value * (colorH + vSpace);
-	ctx3.fillStyle = '#000000';
-	ctx3.fillRect(0, 0, canvImportedFrames.width, canvImportedFrames.height)
+	if(timeOutImageToMatrix != null){ clearTimeout( timeOutImageToMatrix ); timeOutImageToMatrix = null;}
+	timeOutImageToMatrix = setTimeout(function(){
 
-	switch(scanAspect){
-		case 0: // l-r
-			var	pixelSizeW = previewW / inFrames.value,
-				pixelSizeH = previewW * 0.12 /24;
+		var	ctx3 = canvImportedFrames.getContext('2d'),
+			colorW = Math.floor(canvImportedFrames.width/24),
+			colorH = 10,
+			vSpace = 5,
+			colorL = Math.round((canvImportedFrames.width - 24 * colorW) / 2);
 
-			for(var x = 0; x < inFrames.value; x++){
-				for(var y = 0; y < 24; y++){
-					var	pixelIndex = (y * inFrames.value + x) * 4,
-						lCol = adjustColor({r:imgImportData.data[pixelIndex], g:imgImportData.data[pixelIndex + 1], b:imgImportData.data[pixelIndex + 2]}),
-						vCol = getViewColor(lCol);
+		canvImportedFrames.height = inFrames.value * (colorH + vSpace) + vSpace;
 
-					ctxV.fillStyle='rgba(' + vCol.r + ', ' + vCol.g + ', ' + vCol.b + ',1)';
-					ctxV.fillRect(Math.round(x * pixelSizeW), Math.round(y * pixelSizeH), Math.ceil(pixelSizeW), Math.ceil(pixelSizeH));
+		ctx3.clearRect(0, 0, canvImportedFrames.width, canvImportedFrames.height);
 
-					if(vCol.r == 0 && vCol.g == 0 && vCol.b == 0){
-						ctx3.fillStyle='#7f7f7f';
-						ctx3.fillRect(colorL + (23 - y) * colorW + colorW/2, x * (colorH + vSpace) + colorH/2, 1, 1);
-					} else {
-						ctx3.fillStyle='rgba(' + vCol.r + ', ' + vCol.g + ', ' + vCol.b + ',1)';
-						ctx3.fillRect(colorL + (23 - y) * colorW, x * (colorH + vSpace), colorW-1, colorH);
+		switch(scanAspect){
+			case 0: // l-r
+				var	pixelSizeW = previewW / inFrames.value,
+					pixelSizeH = previewW * 0.12 /24;
+				for(var x = 0; x < inFrames.value; x++){
+
+					if(importViewType == 2){
+						var	pos = [],	//{x:0, y:0}
+							ledArray = [],	//{r:0, g:0, b:0}
+							yPos = x * (colorH + vSpace) + vSpace + colorH/2;
 					}
+
+					for(var y = 0; y < 24; y++){
+						var	pixelIndex = (y * inFrames.value + x) * 4,
+							lCol = adjustColor({r:imgImportData.data[pixelIndex], g:imgImportData.data[pixelIndex + 1], b:imgImportData.data[pixelIndex + 2]});
+
+						switch(importViewType){
+						case 0:
+							drawColorRect(colorL + (23 - y) * colorW, x * (colorH + vSpace) + vSpace, colorW, colorH, lCol, canvImportedFrames, '#7f7f7f');
+							break;
+
+						case 1:
+							drawLedRect(colorL + (23 - y) * colorW, x * (colorH + vSpace) + vSpace, colorW, colorH, lCol, canvImportedFrames);
+							break;
+
+						case 2:
+							var xPos = colorL + (23 - y) * colorW + colorW/2;
+							pos.push({x:xPos, y:yPos});
+							ledArray.push(lCol)
+							break;
+						}
+					}
+					if(importViewType == 2){
+						drawLedGroup(canvImportedFrames, pos, ledArray, colorW, colorL, x * (colorH + vSpace) + vSpace, colorW * 24, colorH);
+					}
+
+
+					ctx3.fillStyle='#7f7f7f';
+					ctx3.fillRect(colorL + 11 * colorW + colorW/2 - 1, x * (colorH + vSpace), 2, vSpace);
 				}
-				ctx3.fillStyle='#7f7f7f';
-				ctx3.fillRect(colorL + 11 * colorW + colorW/2 - 1, x * (colorH + vSpace) + colorH, 2, vSpace);
-			}
-			break;
+				break;
 
-		case 1: // u-d
-			var	pixelSizeH = previewH / inFrames.value,
-				pixelSizeW = previewH * 0.12 / 24;
+			case 1: // u-d
+				var	pixelSizeH = previewH / inFrames.value,
+					pixelSizeW = previewH * 0.12 / 24;
 
-			for(var x = 0; x < 24; x++){
 				for(var y = 0; y < inFrames.value; y++){
-					var	pixelIndex = (y * 24 + x) * 4,
-						lCol = adjustColor({r:imgImportData.data[pixelIndex], g:imgImportData.data[pixelIndex + 1], b:imgImportData.data[pixelIndex + 2]}),
-						vCol = getViewColor(lCol);
 
-					ctxV.fillStyle='rgba(' + vCol.r + ', ' + vCol.g + ', ' + vCol.b + ',1)';
-					ctxV.fillRect(Math.round(x * pixelSizeW), Math.round(y * pixelSizeH), Math.ceil(pixelSizeW), Math.ceil(pixelSizeH));
-
-					if(vCol.r == 0 && vCol.g == 0 && vCol.b == 0){
-						ctx3.fillStyle='#7f7f7f';
-						ctx3.fillRect(colorL + x * colorW + colorW/2, y * (colorH + vSpace) + colorH/2, 1, 1);
-					} else {
-						ctx3.fillStyle='rgba(' + vCol.r + ', ' + vCol.g + ', ' + vCol.b + ',1)';
-						ctx3.fillRect(colorL + x * colorW, y * (colorH + vSpace), colorW-1, colorH);
+					if(importViewType == 2){
+						var	pos = [],	//{x:0, y:0}
+							ledArray = [],	//{r:0, g:0, b:0}
+							yPos = y * (colorH + vSpace) + vSpace + colorH/2;
 					}
-					if(x == 0){
-						ctx3.fillStyle='#7f7f7f';
-						ctx3.fillRect(colorL + 11 * colorW + colorW/2 - 1, y * (colorH + vSpace) + colorH, 2, vSpace);
+
+					for(var x = 0; x < 24; x++){
+						var	pixelIndex = (y * 24 + x) * 4,
+							lCol = adjustColor({r:imgImportData.data[pixelIndex], g:imgImportData.data[pixelIndex + 1], b:imgImportData.data[pixelIndex + 2]});
+
+						switch(importViewType){
+						case 0:
+							drawColorRect(colorL + x * colorW, y * (colorH + vSpace) + vSpace, colorW, colorH, lCol, canvImportedFrames, '#7f7f7f');
+							break;
+
+						case 1:
+							drawLedRect(colorL + x * colorW, y * (colorH + vSpace) + vSpace, colorW, colorH, lCol, canvImportedFrames);
+							break;
+
+						case 2:
+							var xPos = colorL + x * colorW + colorW/2;
+							pos.push({x:xPos, y:yPos});
+							ledArray.push(lCol)
+							break;
+
+						}
+						if(x == 0){
+							ctx3.fillStyle='#7f7f7f';
+							ctx3.fillRect(colorL + 11 * colorW + colorW/2 - 1, y * (colorH + vSpace), 2, vSpace);
+						}
+					}
+					if(importViewType == 2){
+						drawLedGroup(canvImportedFrames, pos, ledArray, colorW, colorL, y * (colorH + vSpace) + vSpace, colorW * 24, colorH);
+					}
+
+				}
+
+
+
+
+
+/*
+				for(var x = 0; x < 24; x++){
+					for(var y = 0; y < inFrames.value; y++){
+						var	pixelIndex = (y * 24 + x) * 4,
+							lCol = adjustColor({r:imgImportData.data[pixelIndex], g:imgImportData.data[pixelIndex + 1], b:imgImportData.data[pixelIndex + 2]}),
+							vCol = getViewColor(lCol);
+
+						drawLedRect(colorL + x * colorW, y * (colorH + vSpace) + vSpace, colorW, colorH, lCol, canvImportedFrames);
+						if(x == 0){
+							ctx3.fillStyle='#7f7f7f';
+							ctx3.fillRect(colorL + 11 * colorW + colorW/2 - 1, y * (colorH + vSpace), 2, vSpace);
+						}
 					}
 				}
-			}
-			break;
-	}
+*/
+				break;
+		}
+		ctx3.globalCompositeOperation='destination-over';
+		ctx3.fillStyle = '#000000';
+		ctx3.fillRect(0, 0, canvImportedFrames.width, canvImportedFrames.height);
+		timeOutImageToMatrix = null;
+	}, 200);
+}
+
+function importImageToPreview(){
+	// copy imgImportData to preview area
+
+		if(imgImport == null){return;}
+		var	ctxV = canvImportV.getContext('2d'), // view-canvas inside selected area
+			colorW = Math.floor(canvImportedFrames.width/24),
+			colorH = 10,
+			vSpace = 5,
+			colorL = Math.round((canvImportedFrames.width - 24 * colorW) / 2);
+
+		ctxV.fillStyle = '#000000';
+		ctxV.fillRect(0,0,canvImportV.width, canvImportV.height);
+
+		switch(scanAspect){
+			case 0: // l-r
+				var	pixelSizeW = previewW / inFrames.value,
+					pixelSizeH = previewW * 0.12 /24;
+				for(var x = 0; x < inFrames.value; x++){
+
+					for(var y = 0; y < 24; y++){
+						var	pixelIndex = (y * inFrames.value + x) * 4,
+							lCol = adjustColor({r:imgImportData.data[pixelIndex], g:imgImportData.data[pixelIndex + 1], b:imgImportData.data[pixelIndex + 2]}),
+							vCol = getViewColor(lCol);
+
+						ctxV.fillStyle='rgba(' + vCol.r + ', ' + vCol.g + ', ' + vCol.b + ',1)';
+						ctxV.fillRect(Math.round(x * pixelSizeW), Math.round(y * pixelSizeH), Math.ceil(pixelSizeW), Math.ceil(pixelSizeH));
+					}
+				}
+				break;
+
+			case 1: // u-d
+				var	pixelSizeH = previewH / inFrames.value,
+					pixelSizeW = previewH * 0.12 / 24;
+
+				for(var x = 0; x < 24; x++){
+					for(var y = 0; y < inFrames.value; y++){
+						var	pixelIndex = (y * 24 + x) * 4,
+							lCol = adjustColor({r:imgImportData.data[pixelIndex], g:imgImportData.data[pixelIndex + 1], b:imgImportData.data[pixelIndex + 2]}),
+							vCol = getViewColor(lCol);
+
+						ctxV.fillStyle='rgba(' + vCol.r + ', ' + vCol.g + ', ' + vCol.b + ',1)';
+						ctxV.fillRect(Math.round(x * pixelSizeW), Math.round(y * pixelSizeH), Math.ceil(pixelSizeW), Math.ceil(pixelSizeH));
+					}
+				}
+				break;
+		}
 }
 
 function importImageToFrames(){
@@ -337,12 +452,16 @@ function importImageToFrames(){
 
 	ledFrame = frame;
 	ledFrames = frames.slice(0);
+
 	inRPM.value = 0; inFPS.value = 10; inTFPS.value = 60;
 	refreshFramesList();
 	refreshLedMarkers();
 	drawLedRing();
 	drawAllFramePreviews();
+
 	saveAnimation();
+	animationIndex[selectedAnimation].name = imgImportFile.name;
+
 	refreshCounter();
 	refreshCounter(ledFrames.length);
 	actionUndo();
@@ -374,6 +493,8 @@ function adjustColor(col){// col = {r:, g:, b:}
 	if(colHSL[2] > 1){colHSL[2] = 1;} else if(colHSL[2] < 0){colHSL[2] = 0;}
 
 	var col = hslToRgb(colHSL[0], colHSL[1], colHSL[2]);
+	var colHsv = rgbToHsv(col[0], col[1], col[2]);
+	if(colHsv[2] < 0.005){col = [0,0,0];}
 	return {r:col[0], g:col[1], b:col[2]};
 }
 
@@ -396,6 +517,7 @@ function imageMouseDown(obj, objEvent){
 	}
 	imgImportClick.centerX = Math.round((imgImportClick.layerX - previewL) * (imgSelectW / previewW) + imgSelectL);
 	imgImportClick.centerY = Math.round((imgImportClick.layerY - previewT) * (imgSelectH / previewH) + imgSelectT);
+	sliderImportActivate(sliderZoom);
 	refreshImageData();
 }
 
@@ -411,7 +533,7 @@ function refreshImageData(){
 			} else if(importT > previewT + previewH - importH){
 				importT = previewT + previewH - importH;
 			}
-			importArea.style.top = (importT) + 'px';
+			importArea.style.top = (importT - 2) + 'px';
 			importImageArea();
 			imgImportData = ctx.getImageData(0,0,inFrames.value,24);
 			break;
@@ -432,8 +554,27 @@ function refreshImageData(){
 	}
 	canvImportV.style.width = importArea.style.width;
 	canvImportV.style.height = importArea.style.height;
+	imgImportTrim();
 	importImageToMatrix();
 
+	canvImage.title =	'File: ' + imgImportFile.name +
+				'\nSize: ' + imgImport.width + ' x ' + imgImport.height +
+				'\nZoom: ' + imgSelectW + ' x ' + imgSelectH +
+				'\nArea: ' + Math.round(imgSelectImportW) + ' x ' + Math.round(imgSelectImportH);
+	canvImportV.title = canvImage.title;
+
+
+}
+
+function imgImportTrim(){
+	for(var i = 0; i < imgImportData.data.length; i += 4){
+		var colHsv = rgbToHsv( imgImportData.data[i], imgImportData.data[i + 1], imgImportData.data[i + 2] );
+		if( colHsv[2] > 0 && colHsv[2] < 0.005 ){
+			imgImportData.data[i] = 0;
+			imgImportData.data[i+1] = 0;
+			imgImportData.data[i+2] = 0;
+		}
+	}
 }
 
 function imageMouseMove(objEvent){

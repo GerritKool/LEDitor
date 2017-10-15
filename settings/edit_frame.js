@@ -10,15 +10,15 @@ function refreshLedMarkers(){
 			rgbLED = ledFrame[i].r + ', ' + ledFrame[i].g + ', ' + ledFrame[i].b,
 			hsvLED = rgbToHsv(ledFrame[i].r, ledFrame[i].g, ledFrame[i].b);
 			colX = document.getElementById('ledMarker'+i),
-			xPos = editW2 + (caseRadius - ledEditW * 0.9 ) * Math.cos(angle),
-			yPos = editW2 + (caseRadius - ledEditW * 0.9 ) * Math.sin(angle);
+			xPos = editorHalfWidth + (caseRadius - ledEditWidth * 0.9 ) * Math.cos(angle),
+			yPos = editorHalfWidth + (caseRadius - ledEditWidth * 0.9 ) * Math.sin(angle);
 
-		drawLedRound(xPos, yPos, ledEditW*0.57, ledFrame[i], canvLedMarkers);
+		drawLedRound(xPos, yPos, ledEditWidth*0.57, ledFrame[i], canvLedMarkers);
 
-		colX.style.left = Math.round(xPos - ledEditW/2 - borderMarkerW) + 'px';
-		colX.style.top = Math.round(yPos - ledEditW/2 - borderMarkerW) + 'px';
-		colX.style.width = ledEditW + 'px';
-		colX.style.height = ledEditW + 'px';
+		colX.style.left = Math.round(xPos - ledEditWidth/2 - borderMarkerW) + 'px';
+		colX.style.top = Math.round(yPos - ledEditWidth/2 - borderMarkerW) + 'px';
+		colX.style.width = ledEditWidth + 'px';
+		colX.style.height = ledEditWidth + 'px';
 		if(rgbLED == '0, 0, 0'){
 			colX.style.color = 'rgba( 255, 127, 127, 1)';
 		} else {
@@ -292,4 +292,3 @@ function setLedMarker(obj){
 	drawFramePreview(selectedFrame);
 	refreshButtons();
 }
-

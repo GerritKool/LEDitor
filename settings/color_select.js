@@ -53,14 +53,14 @@ function createPaletteData(){
 function setupAdvancedPresets(){
 // setup advanced color presets (off, red, yellow, green, cyan, blue, magenta, white)
 	var	h = 0, s = 0, v = 0,
-		butWidth = Math.floor((400 - 2 * 20) / 8),
+		butWidth = Math.floor((editorWidth - 2 * (editorWidth/20)) / 8),
 		butHeight = butWidth / 3;
 
 	for(var i = 0; i < 8; i ++){
 		var xObj = document.getElementById('colPreset'+i);
 		xObj.style.position = 'absolute';
-		xObj.style.left = (i*45+20)+ 'px';
-		xObj.style.top='325px';
+		xObj.style.left = (i * butWidth + (editorWidth/20))+ 'px';
+		xObj.style.top= (editorWidth - 60  - butHeight) + 'px';
 		xObj.style.width = butWidth + 'px';
 		xObj.style.height = butHeight + 'px';
 		xObj.style.backgroundColor = 'rgba(0,0,0,0)';
@@ -78,8 +78,8 @@ function setupAdvancedPresets(){
 
 		var	ctx = canvColorSet.getContext("2d");
 		ctx.fillStyle='#000000';
-		ctx.fillRect(i*butWidth+20 + 1, 325 + 1, butWidth-2, butHeight-2);
-		drawLedRect(i*butWidth+20 + 1, 325 + 1, butWidth-2, butHeight-2, objRgb, canvColorSet);
+		ctx.fillRect(i*butWidth + (editorWidth/20) + 1, xObj.offsetTop + 1, butWidth-2, butHeight-2);
+		drawLedRect(i*butWidth + (editorWidth/20) + 1, xObj.offsetTop + 1, butWidth-2, butHeight-2, objRgb, canvColorSet);
 		xObj.style.color = 'rgb(' + xVal.r + ',' + xVal.g + ',' + xVal.b + ')';
 	}
 }
@@ -92,14 +92,14 @@ function redrawPalette(){
 		xHeight = colSet0.offsetHeight,
 		cWidth = xWidth - bWidth * 2,
 		cHeight = xHeight - bWidth * 2,
-		yTop = (4 + editW2 - divColorPal.offsetHeight/2);
+		yTop = (4 + editorHalfWidth - divColorPal.offsetHeight/2);
 
 	ctx.clearRect(0, 0, canvColorSet.width, canvColorSet.height);
 	ctx.globalCompositeOperation = 'source-over';
 	for(var j=0; j< stepColBright*2+1 ; j++){
 		for(var i=0; i<colBase.length; i++){
 			var	colRGB = colPal[colBase.length * j + i],
-				x1 = i * xWidth,
+				x1 = i * xWidth + divColorPal.offsetLeft,
 				y1 = j * xHeight;
 
 			ctx.fillStyle = '#000000';
@@ -123,12 +123,9 @@ function redrawPalette(){
 			document.getElementById('colSet'+(colBase.length * j + i)).style.borderColor = getTopColor().b;
 		}
 	}
-
 	ctx.globalCompositeOperation = 'destination-over';
-	ctx.fillStyle = getTopColor().b;
-	ctx.fillRect(0, 0, canvColorSet.width, canvColorSet.height);
+	redrawColorSurface();
 	ctx.globalCompositeOperation = 'source-over';
-	ctx.clearRect(50, 5, canvColorSet.width - 55, 20);
 }
 
 function redrawSliders(){
@@ -154,27 +151,50 @@ function redrawSliders(){
 	sliderColorSatValue.style.color = getTopColor().t;
 	sliderColorValValue.style.color = getTopColor().t;
 
+
+	sliderColorHueInfo.style.left = (sliderColorHue.offsetLeft) + 'px';
+	sliderColorSatInfo.style.left = (sliderColorSat.offsetLeft) + 'px';
+	sliderColorValInfo.style.left = (sliderColorVal.offsetLeft) + 'px';
+	sliderColorHueValue.style.left = (sliderColorHue.offsetLeft + sliderColorHue.offsetWidth - sliderColorHueValue.offsetWidth) + 'px';
+	sliderColorSatValue.style.left = (sliderColorSat.offsetLeft + sliderColorSat.offsetWidth - sliderColorSatValue.offsetWidth) + 'px';
+	sliderColorValValue.style.left = (sliderColorVal.offsetLeft + sliderColorVal.offsetWidth - sliderColorValValue.offsetWidth) + 'px';
+
+	sliderColorHueInfo.style.top = (sliderColorHue.offsetTop - sliderColorHueInfo.offsetHeight) + 'px';
+	sliderColorSatInfo.style.top = (sliderColorSat.offsetTop - sliderColorSatInfo.offsetHeight) + 'px';
+	sliderColorValInfo.style.top = (sliderColorVal.offsetTop - sliderColorValInfo.offsetHeight) + 'px';
+	sliderColorHueValue.style.top = (sliderColorHue.offsetTop - sliderColorHueValue.offsetHeight) + 'px';
+	sliderColorSatValue.style.top = (sliderColorSat.offsetTop - sliderColorSatValue.offsetHeight) + 'px';
+	sliderColorValValue.style.top = (sliderColorVal.offsetTop - sliderColorValValue.offsetHeight) + 'px';
+
 	// draw slider indicator graphics
-	for(var i = 0; i <= trackWidth; i ++){
-		var posL = 5 + sliderL + i;
+	for(var ii = 0; ii < 360; ii ++){
+		var	i = Math.round(trackWidth/360 * ii),
+			w = Math.round(trackWidth/360 * (ii + 1)) - i,
+			posL = 5 + sliderL + i;
 
 		// hue
 		var colRgb = hsvToRgb(i * slideGraphStep, 1, 1);
 		var objRgb = adjustRgbGamma({r:colRgb[0], g:colRgb[1], b:colRgb[2]})
 		ctx.fillStyle = 'rgba(' + Math.round(objRgb.r) + ', ' + Math.round(objRgb.g) + ', ' + Math.round(objRgb.b) +',1 )';
-		ctx.fillRect( posL, sliderT[0]-2, 1, sliderH + 4 );
+		ctx.fillRect( posL, sliderT[0]-2, w, sliderH + 4 );
+	}
+
+	for(var ii = 0; ii < 100; ii += 0.5){
+		var	i = Math.round(trackWidth/100 * ii),
+			w = Math.round(trackWidth/100 * (ii + 0.5)) - i,
+			posL = 5 + sliderL + i;
 
 		// saturation
 		var colRgb = hsvToRgb( h, i * slideGraphStep, 1);
 		var objRgb = adjustRgbGamma({r:colRgb[0], g:colRgb[1], b:colRgb[2]})
 		ctx.fillStyle = 'rgba(' + Math.round(objRgb.r) + ', ' + Math.round(objRgb.g) + ', ' + Math.round(objRgb.b) +',1 )';
-		ctx.fillRect( 5 + sliderL + i, sliderT[1]-2, 1, sliderH + 4 );
+		ctx.fillRect( 5 + sliderL + i, sliderT[1]-2, w, sliderH + 4 );
 
 		// brightness
 		var colRgb = hsvToRgb( h, s, i * slideGraphStep);
 		var objRgb = adjustRgbGamma({r:colRgb[0], g:colRgb[1], b:colRgb[2]})
 		ctx.fillStyle = 'rgba(' + Math.round(objRgb.r) + ', ' + Math.round(objRgb.g) + ', ' + Math.round(objRgb.b) +',1 )';
-		ctx.fillRect( 5 + sliderL + i, sliderT[2]-2, 1, sliderH + 4 );
+		ctx.fillRect( 5 + sliderL + i, sliderT[2]-2, w, sliderH + 4 );
 	}
 	// slider border
 	ctx.shadowBlur = 0;
@@ -220,7 +240,7 @@ function redrawColorSurface(){
 
 	ctx.fillStyle = getTopColor().b;
 	ctx.fillRect(0, 0, canvColorSet.width, canvColorSet.height);
-	ctx.clearRect(50, 5, canvColorSet.width - 55, 20);
+	ctx.clearRect(50, editorWidth/80, canvColorSet.width - 55, editorWidth/20);
 }
 
 function refreshAdvancedUserPresets(colCompare){ // colCompare = rgbObject
@@ -228,10 +248,10 @@ function refreshAdvancedUserPresets(colCompare){ // colCompare = rgbObject
 	if(colCompare == undefined){ colCompare = '';}
 
 	var	butBorder = 1,
-		butWidth = Math.floor((400 - 2 * 20) / 8),
+		butWidth = Math.floor((editorWidth - 2 * (editorWidth/20)) / 8),
 		butHeight = butWidth / 3,
-		butLeft = Math.round((400 - 8 * butWidth) / 2),
-		butTop = 250;
+		butLeft = Math.round((editorWidth - 8 * butWidth) / 2),
+		butTop = (editorWidth - 60  - butHeight * 6);
 
 	but_set_user_color.style.left = butLeft + 'px';
 	but_set_user_color.style.top = butTop + 'px';
@@ -295,6 +315,7 @@ function drawLedColorSelection(){
 		arrLed = [],
 		xStep = canvColorLed.width / 5;
 
+	var ledCenter = editorWidth/80 + editorWidth/40;
 	for(var i = 0; i < 5; i++){
 		var xLed = i; if(i < 3){ xLed += 1; }
 		if( i != 2 ){
@@ -308,6 +329,8 @@ function drawLedColorSelection(){
 
 			objPrev.style.left = (i * xStep + canvColorLed.offsetLeft) + 'px';
 			objPrev.style.width = xStep + 'px';
+			objPrev.style.top = (editorWidth/15) + 'px';
+			objPrev.style.height = (editorWidth/28) + 'px';
 
 		} else {
 			var objVal = 'same';
@@ -316,15 +339,19 @@ function drawLedColorSelection(){
 		switch(objVal){
 			case'same':
 				arrLed.push({r:colRGB.r, g:colRGB.g, b:colRGB.b});
-				arrPos.push({x:xStep/2 + i * xStep, y:15});
+				arrPos.push({x:xStep/2 + i * xStep, y:ledCenter});
 				break;
 			case'inv':
 				arrLed.push({r:invRGB.r, g:invRGB.g, b:invRGB.b});
-				arrPos.push({x:xStep/2 + i * xStep, y:15});
+				arrPos.push({x:xStep/2 + i * xStep, y:ledCenter});
 				break;
 		}
 	}
 	drawLedGroup(canvColorLed, arrPos, arrLed, xStep)
+
+	ctx.globalCompositeOperation='destination-over';
+	ctx.fillStyle = '#000000';
+	ctx.fillRect(0, 0, canvColorLed.width, canvColorLed.height);
 
 	showOnRing( {r: colRGB.r, g: colRGB.g, b: colRGB.b} );
 }

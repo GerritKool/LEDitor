@@ -2,6 +2,8 @@ function onHomeyReady(Homey){
 	instanceHomey = Homey;
 	Homey.ready();
 
+	getSettingControlInfo();
+
 	// collect all html object-ids
 	var	id_index = [],
 		xText = document.getElementById('leditor_ui').innerHTML;
@@ -104,13 +106,15 @@ function onHomeyReady(Homey){
 
 	createFramesList();
 
+
 	getSettingVersion();
 	getSettingTopColor();
 	getSettingColorSelectType();
 	getSettingDirectSelect();
+	getSettingViewFrame();
+	getSettingViewImport();
 	getSettingScreenGamma();
 	getSettingGammaLink();
-	getSettingControlInfo();
 	getSettingShowOnHomey();
 	getSettingShowOnHomeyTime();
 	getSettingUserColor();

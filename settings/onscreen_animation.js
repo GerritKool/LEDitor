@@ -12,15 +12,20 @@ var	frameOnScreenID = 0,
 function clickPlay(obj){
 	playMode = !playMode;
 	if(playMode){
+		prevFramePulse = 0;
+		opacMs = 1;
+		opacStartTime = 0;
+		rotateMs = 0;
+		rotateStartTime = 0;
 		showMessage('prepare_animation');
 		obj.innerHTML = '<img src="../assets/images/ani_working.png" height="30" width="30" style="float: center;">';
-		var waitTime = 700;
+		var waitTime = 500;
 
 		setTimeout(function(){
 			obj.innerHTML = '<img src="../assets/images/ani_stop.png" height="30" width="30" style="float: center;">';
 			rotateStartTime = new Date().getTime();
-			createAnimationFilm();
 			playFrame = 0;
+			createAnimationFilm();
 			showMessage('');
 			frameOnScreenID = requestAnimationFrame(runAnimation);
 		}, waitTime)
@@ -38,6 +43,8 @@ function clickPlay(obj){
 		obj.innerHTML = '<img src="../assets/images/ani_play.png" height="30" width="30" style="float: center;">';
 		if(generatorOn){
 			generatePattern.style.visibility = "visible";
+		} else if(randomizerOn){
+			aniRandomizer.style.visibility = "visible";
 		} else {
 			divEdit.style.visibility = "visible";
 		}
@@ -132,7 +139,7 @@ function createAnimationFilm(){
 	for(var i = 0; i < ledFrames.length; i++){
 		ledFrame = ledFrames[i];
 		drawLedRing();
-		animationFilm[i] = ctxRing.getImageData(0,0,400,400);
+		animationFilm[i] = ctxRing.getImageData(0,0,editorWidth,editorWidth);
 	}
 }
 // ************** END SCREEN ANIMATION ENGINE **************

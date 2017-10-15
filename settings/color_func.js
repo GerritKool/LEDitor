@@ -86,15 +86,14 @@ function createColorFlow(colRGB1, colRGB2, nSteps, flowType){
 			hsv2[1] = hsv1[1];
 		}
 
-
-
 		if(flowType == 'hsv2' && hsv1[0] == hsv2[0]){
-			hsv2[0] -= (1/18 / (hsv2[2] * 84));
-			if(hsv2[0] < 0){hsv2[0] = 1 + hsv2[0];}
+			if(hsv2[2] == 0){
+				hsv2[0] = 0;
+			} else {
+				hsv2[0] -= (1/18 / (hsv2[2] * 84));
+				if(hsv2[0] < 0){hsv2[0] = 1 + hsv2[0];}
+			}
 		}
-
-
-
 
 		var	hueTrack = (hsv2[0] - hsv1[0]),
 			colH = hsv1[0],
@@ -103,6 +102,7 @@ function createColorFlow(colRGB1, colRGB2, nSteps, flowType){
 			colStepH = hueTrack / nSteps,
 			colStepS = (hsv2[1] - hsv1[1]) / nSteps,
 			colStepV = (hsv2[2] - hsv1[2]) / nSteps;
+
 
 		switch(flowType){
 		case'hsv1':

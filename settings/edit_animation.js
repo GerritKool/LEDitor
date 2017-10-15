@@ -8,7 +8,8 @@ var	max_fields = 200,			//maximum frames allowed by Homey
 	playPrevMode = false,			// Animation playing on LED ring?
 	previousFramesLength = 0,		// used to check for animation length changes @ refreshFramesList()
 	previousLedFrames = [],			// used to check for animation frame changes @ drawAllFramePreviews()
-	previousGamma = 0;			// used to check for gamma changes @ drawAllFramePreviews()
+	previousGamma = 0,			// used to check for gamma changes @ drawAllFramePreviews()
+	previousFrameViewType = -1;		// used to check for view changes @ drawAllFramePreviews()
 
 
 
@@ -80,7 +81,6 @@ function changeAniName(obj){
 function saveAnimation(id){
 	if(id == undefined){
 		id = selectedAnimation;
-		//console.log('...setting to saveAnimation(' + id + ')');
 	}
 
 	if(id === ''){ // save for preview
@@ -90,8 +90,6 @@ function saveAnimation(id){
 		var	aniId = 'animation' + id,
 			xRepeat = 1;
 	}
-
-	//console.log('aniId = '+aniId );
 
 	var	aniDuration = xRepeat * Math.round(1000 * ledFrames.length / inFPS.value),
 		xFPS = Number(inFPS.value),
@@ -168,7 +166,6 @@ function clickAniCopy(){
 function frameSelect(obj){
 	if(document.getElementById(obj.id) == undefined){return;}
 	var idx = obj.id;
-	but_generator_close.click();
 	selectedFrame = Number(idx.substr(9));
 	activateSelect();
 }
@@ -223,10 +220,12 @@ function refreshFramesList(){
 }
 
 function getFrameListRow(idx, titRemove){
-	var xCol = getTopColor();
+	var	xCol = getTopColor(),
+		preCanvWidth = divFrameScroll.offsetWidth - 136;
+
 	trLine = '<tr id="frameLine' + idx + '" style="background-color:' + xCol.b + '; color:' + xCol.t + '; border: 1px solid #707070; border-spacing: 0px;" onmouseover="showFrameControls(this);" onmouseout="hideFrameControls(this);" onClick="frameSelect(this);">';
 	trLine += '<td id="frameNum' + idx + '" style="width: 30px; text-align: center; font-size: 12px;">' + (idx+1) + '</td>';
-	trLine += '<td style="width: 264px;"><canvas id="canvPre' + idx + '" width=264 height=20></canvas></td>';
+	trLine += '<td style="width: ' + preCanvWidth + 'px;"><canvas id="canvPre' + idx + '" width=' + preCanvWidth + ' height=20></canvas></td>';
 	trLine += '<td style="width: 5px;"></td>';
 	trLine += '<td style="width: 18px;">';
 	trLine += '<button id="moveUp' + idx + '" style="visibility: hidden; width:18px; height:18px; padding: 0px 0px;" title="' + thisApp.text.move_up + '" onmousedown="clickFrameMove(this);"><img src="../assets/images/frame_up.png" height="16" width="16" style="float: center;"></button>';
@@ -245,32 +244,60 @@ function refreshFrameNr(nr){
 	frameNumber.innerHTML = 'Frame: ' + nr;
 }
 
-
 function drawFramePreview(idx){ // idx = frame nr.
 	if(ledFrames[idx] != undefined && selectedFrame>=0){
 		var	canvPrev = document.getElementById('canvPre'+idx),
 			ctxPrev = canvPrev.getContext("2d"),
 			colW = canvPrev.width/24,
-			xCol = getTopColor();
+			xCol = getTopColor(),
 			pos = [],			//{x:0, y:0}
 			ledArray = [],
 			yPos = canvPrev.height * 0.4,
-			colH = colW;
-
-		// calc led positions
-		pos.push({x:0, y:yPos});
-		ledArray.push(ledFrames[idx][9])
-
-		ledFrames[idx].forEach(function(item, index){
-			var xPos = 8 - index;
-			if(xPos < 0){xPos += 24;}
-			xPos = xPos * colW + colW;
-			pos.push({x:xPos, y:yPos});
-			ledArray.push(item)
-		});
+			colH = canvPrev.height * 0.7;
 
 		ctxPrev.clearRect(0, 0, canvPrev.width, canvPrev.height);
-		drawLedGroup(canvPrev, pos, ledArray, colW * 0.9, 3, 0, canvPrev.height * 0.4 - colH / 2, canvPrev.width, colH);
+		switch(frameViewType){
+		case 0: // color view
+			drawColorRect(-colW/2, yPos - colH/2, colW-1, colH, ledFrames[idx][9], canvPrev);
+			ledFrames[idx].forEach(function(item, index){
+				var xPos = 8 - index;
+				if(xPos < 0){xPos += 24;}
+				xPos = xPos * colW + colW;
+				drawColorRect(xPos - colW/2, yPos - colH/2, colW, colH, item, canvPrev);
+			});
+			break;
+
+		case 1: // led view
+			drawLedRect(-colW/2, yPos - colH/2, colW, colH, ledFrames[idx][9], canvPrev)
+			ledFrames[idx].forEach(function(item, index){
+				var xPos = 8 - index;
+				if(xPos < 0){xPos += 24;}
+				xPos = xPos * colW + colW;
+				drawLedRect(xPos - colW/2, yPos - colH/2, colW, colH, item, canvPrev)
+			});
+			break;
+
+		case 2: // ring view
+			pos.push({x:0, y:yPos});
+			ledArray.push(ledFrames[idx][9])
+
+			ledFrames[idx].forEach(function(item, index){
+				var xPos = 8 - index;
+				if(xPos < 0){xPos += 24;}
+				xPos = xPos * colW + colW;
+				pos.push({x:xPos, y:yPos});
+				ledArray.push(item)
+			});
+
+			drawLedGroup(canvPrev, pos, ledArray, colW, 0, canvPrev.height * 0.4 - colH / 2, canvPrev.width, colH);
+
+			break;
+		}
+
+		ctxPrev.globalCompositeOperation='destination-over';
+		ctxPrev.fillStyle = '#000000';
+		ctxPrev.fillRect(0, canvPrev.height * 0.4 - colH / 2, canvPrev.width, colH);
+
 
 		// draw markers
 		ctxPrev.globalCompositeOperation = 'source-over';
@@ -300,7 +327,9 @@ function drawAllFramePreviews(){
 		ledFrames.forEach(function(item, index){
 			var frameChanged = false;
 
-			if( previousGamma != (Number(settingGammaR.value) + Number(settingGammaG.value) + Number(settingGammaB.value)) ){
+			if( previousFrameViewType != frameViewType ){
+				frameChanged = true;
+			} else if( previousGamma != (Number(settingGammaR.value) + Number(settingGammaG.value) + Number(settingGammaB.value)) ){
 				frameChanged = true;
 			} else if(!frameChanged && (previousLedFrames.length == ledFrames.length)){
 				for(var i = 0; i < 24; i++ ){
@@ -317,10 +346,10 @@ function drawAllFramePreviews(){
 
 			if(frameChanged){drawFramePreview(index);}
 		});
-		showMessage('');
+
 		previousLedFrames = ledFrames.slice(0);
 		previousGamma = Number(settingGammaR.value) + Number(settingGammaG.value) + Number(settingGammaB.value);
-			
+		previousFrameViewType = frameViewType;
 	}, 500);
 }
 

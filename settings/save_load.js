@@ -2,6 +2,8 @@
 var storeLeditorOn = false;
 
 function storeLeditor() {
+	if( animationIndex[selectedAnimation] == undefined ){return;}
+
 	storeLeditorOn = true;
 	var	ctxExport = canvImageExport.getContext("2d"),
 		stepW = 1,
@@ -135,7 +137,6 @@ function loadLeditor(ev) {
 					aniName += String.fromCharCode(infoData[22 + i]);
 				}
 				aniName = aniName.trim();
-				//animationIndex[selectedAnimation] = {name: aniName};
 				animationIndex[selectedAnimation].name = aniName;
 				setSettingAnimationIndex();
 				refreshAnimationSelection();

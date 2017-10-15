@@ -3,7 +3,7 @@ var	topColor = 0,			// editor surface color: 0...3 (black, 33% grey, 67% grey, w
 	animationIndex = [],			// animation index, [{ name: <animation name 1> }, { name: <animation name 2> }, ... ]
 	userColor = [],			// advanced color, user presets
 	maxAnimationNumber = 100,	// maximum number of available animations
-	
+
 	// timeout controls to prevent for 'machine gun' saving
 	preventRepeatTime = 500,
 	timeoutSetGamma = null,
@@ -82,6 +82,18 @@ function setSettingDirectSelect(){
 	});
 }
 
+function setSettingViewFrame(){
+	instanceHomey.set('viewTypeFrame', frameViewType, function(err, frameViewType){
+		if(err) return console.error('Could not set setting viewTypeFrame');
+	});
+}
+
+function setSettingViewImport(){
+	instanceHomey.set('viewTypeImport', importViewType, function(err, importViewType){
+		if(err) return console.error('Could not set setting viewTypeImport');
+	});
+}
+
 function setSettingShowOnHomey(){
 	var xCheck = settingShowHomey.checked;
 	instanceHomey.set('showHomey', xCheck, function(err, xCheck){
@@ -110,12 +122,11 @@ function setSettingAnimationIndex(){
 }
 
 function setSettingAnimation(aniId, aniData){
-	//console.log(aniId);
 	switch(aniId){
 	case 'leditor_preview': case 'leditor_edit': // set preview animation
 		instanceHomey.set(aniId, aniData, function(err, aniId){
 			if(err) return console.error('Could not set preview ' + aniId, err);
-			
+
 		});
 		break;
 
@@ -196,6 +207,7 @@ function getSettingControlInfo(){
 			xCheck = true;
 		}
 		settingControlInfo.checked = xCheck;
+		clickControl(settingControlInfo);
 	});
 }
 
@@ -206,12 +218,33 @@ function getSettingDirectSelect(){
 		}
 		colorDirectSelect.checked = xCheck;
 	});
+}
 
-	var xCheck = colorDirectSelect.checked;
-	instanceHomey.set('colorDirectSelect', xCheck, function(err, xCheck){
-		if(err) return console.error('Could not set setting colorDirectSelect');
+function getSettingViewFrame(){
+	instanceHomey.get('viewTypeFrame', function(err, vType){
+		if (vType == undefined){
+			vType = 2;
+		}
+		frameViewType = vType-1;
+		clickControl(but_view_frames);
 	});
 }
+
+function getSettingViewImport(){
+	instanceHomey.get('viewTypeImport', function(err, vType){
+		if (vType == undefined){
+			vType = 2;
+		}
+		importViewType = vType-1;
+		clickControl(but_view_import);
+	});
+}
+
+
+
+
+
+
 
 function getSettingShowOnHomey(){
 	instanceHomey.get('showHomey', function(err, xCheck){
@@ -298,6 +331,7 @@ function getSettingAnimation(aniId){
 		} else {
 			actionUndo('init');
 		}
+		showMessage('');
 		refreshButtons();
 	});
 }

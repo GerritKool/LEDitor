@@ -188,7 +188,7 @@ function generateSparkle(colRGB, colRGB2, colRGB3) {
 		colRGB = [-1, -1, -1];
 		var arrayRandomColors = getRandomColors(totalFrames * 3);
 		var col = []; for(var i = 0; i< totalFrames; i++){col.push(0);}
-		
+
 		var indexCol = 0;
 	} else if(colRGB[0] == 0 && colRGB[1] == 0 && colRGB[2] == 0){ // full flow
 		var col = getColorFlow(totalFrames);
@@ -1177,12 +1177,7 @@ function runGenerator(genType){
 	if(!doRandom){
 		notUsed('random');
 	}
-/*
-	if(!checkFullFlow.disabled && checkFullFlow.checked){
-		dropGenFlowType.disabled = true;
-		genFlowType.style.color = text_color.off;
-	}
-*/
+	
 	switch(nColors){
 	case 1:
 		genColInfo1.innerHTML = thisApp.text.first_color;

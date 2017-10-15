@@ -1,8 +1,6 @@
 
 // ********** animation edit **********
 
-
-
 function addNewFrame() {
 	ledFrames.push(emptyFrame.slice(0));
 	refreshCounter(1);
@@ -36,6 +34,7 @@ function aniFill(fillType){
 	if(fillType == undefined){fillType = '';}
 
 	ledFrames.forEach(function(item, index){
+
 		var ledVal = 0;
 		for(var led = 0; led < 24; led ++){
 			ledVal += Number(item[led].r) + Number(item[led].g) + Number(item[led].b);
@@ -84,8 +83,8 @@ function aniFill(fillType){
 				} else {
 					var fStep = ledFrames.length + frameEnd.id - frameStart.id;
 				}
-
 				var ctrl = [];
+
 				switch(fillType){
 				case'connect':
 					// **** connect fill: change color & position to nearest led in frameEnd ****
@@ -119,13 +118,14 @@ function aniFill(fillType){
 									led2 = 24;
 								}
 							}
-							
+
 							var movePos1 = ledEnd[0] - led; // position shift flow 1
 							if(movePos1 > 12){movePos1 = -24 + movePos1;}
 							if(movePos1 < -12){movePos1 = 24 + movePos1;}
 
 							if(ledEnd[1] != 24){ // flow 2 activated?
 								var movePos2 = ledEnd[1] - led; // position shift flow 2
+								if(movePos2 == movePos1){movePos2 = -movePos2;}
 								if(movePos2 > 12){movePos2 = -24 + movePos2;}
 								if(movePos2 < -12){movePos2 = 24 + movePos2;}
 
@@ -138,7 +138,7 @@ function aniFill(fillType){
 									colArray.push( createColorFlow(ledFrames[frameStart.id][led], ledFrames[frameEnd.id][ledEnd[1]], fStep, dropAniConnectType.value) );
 								}
 							}
-							
+
 							var moveStep = movePos1 / fStep;
 							ctrlArray.push({posL:led, posStep:moveStep});
 							colArray.push( createColorFlow(ledFrames[frameStart.id][led], ledFrames[frameEnd.id][ledEnd[0]], fStep, dropAniConnectType.value) );
@@ -148,10 +148,10 @@ function aniFill(fillType){
 					}
 
 					var frCount = 1;
-					var frEdit = frameStart.id+1;
+					var frEdit = frameStart.id + 1;
+					if(frEdit >= ledFrames.length){frEdit -= ledFrames.length;}
 					while(frEdit != frameEnd.id){
 						var frameNew = emptyFrame.slice(0);
-
 						for(led = 0; led < 24; led ++){
 							for(var i=0; i < ctrl[led].length; i++){
 								ctrl[led][i].posL += ctrl[led][i].posStep;
@@ -180,30 +180,28 @@ function aniFill(fillType){
 								frameNew[ledNr] = {r:replaceCol[0], g:replaceCol[1], b:replaceCol[2] };
 							}
 						}
-
 						ledFrames[frEdit] = frameNew.slice(0);
 						frEdit ++; if(frEdit == ledFrames.length){frEdit = 0;}
 						frCount ++;
 					}
 					break;
 
-
-
 				case'flow':
 					// **** vertical fill: move color to opposite led in frameEnd ****
 					for(led = 0; led < 24; led ++){
 						var	col1 = ledFrames[frameStart.id][led],
 							col2 = ledFrames[frameEnd.id][led];
-				
+
 						var	newLeds = createColorFlow(ledFrames[frameStart.id][led], ledFrames[frameEnd.id][led], fStep, dropAniFlowType.value );
 						ctrl[led] = newLeds.slice(0);
-
 					}
 
-					var frEdit = frameStart.id+1;
+					var frEdit = frameStart.id + 1;
+					if(frEdit >= ledFrames.length){frEdit -= ledFrames.length;}
 					while(frEdit != frameEnd.id){
 						var frameNew = [];
 						frFlow = frEdit - frameStart.id
+						if(frFlow < 0 ){frFlow += ledFrames.length;}
 						for(led = 0; led < 24; led ++){
 							frameNew.push(ctrl[led][frFlow]);
 						}
@@ -215,7 +213,6 @@ function aniFill(fillType){
 				default:
 					return;
 				}
-
 
 				// go on finding next hole
 				index = Number(frameEnd.id-1);
@@ -303,4 +300,54 @@ function frameRotateClock(frameNr){
 
 function frameRotateCounterclock(frameNr){
 	ledFrames[frameNr] = ledFrames[frameNr].slice(1, 24).concat([ledFrames[frameNr][0]]);
+}
+
+function frameRandomize(frameNr){
+	var	xLeds = emptyFrame.slice(0),
+		randHue = (1 / 360) * (-sliderRandomizerHue.value + Math.round( Math.random() * sliderRandomizerHue.value * 2 )),
+		randSat = (1 / 100) * (-sliderRandomizerSat.value + Math.round( Math.random() * sliderRandomizerSat.value * 2 )),
+		randBright = (1 / 100) * (-sliderRandomizerBright.value + Math.round( Math.random() * sliderRandomizerBright.value * 2 )),
+		randPos = Math.round(-sliderRandomizerPosition.value +  Math.random() * sliderRandomizerPosition.value * 2);
+
+	ledFrames[frameNr].forEach(function(item, index){
+		var colHSV = rgbToHsv(item.r, item.g, item.b);
+		var ledPos = index; // led position
+		if(colHSV[2] > 0){
+			if(checkEachLedRandomizer.checked){
+				randHue = (-sliderRandomizerHue.value + Math.round( Math.random() * sliderRandomizerHue.value * 2 )) / 360;
+				randSat = (-sliderRandomizerSat.value + Math.round( Math.random() * sliderRandomizerSat.value * 2 )) / 100;
+				randBright = (-sliderRandomizerBright.value + Math.round( Math.random() * sliderRandomizerBright.value * 2 )) / 100;
+				randPos = Math.round(-sliderRandomizerPosition.value +  Math.random() * sliderRandomizerPosition.value * 2);
+			}
+			colHSV[0] += randHue;
+			colHSV[1] += randSat;
+			colHSV[2] += randBright;
+			ledPos += randPos;
+			if(colHSV[0] < 0){colHSV[0] += 1;} else if(colHSV[0] > 1){colHSV[0] -= 1;}
+			if(colHSV[1] < 0){colHSV[1] = -colHSV[1];} else if(colHSV[1] > 1){colHSV[1] = 2 - colHSV[1];}
+			if(colHSV[2] < 0){colHSV[2] = -colHSV[2];} else if(colHSV[2] > 1){colHSV[2] = 2 - colHSV[2];}
+			if(ledPos < 0){ledPos += 24;} else if(ledPos > 23){ledPos -= 24;}
+		}
+		var colRGB = hsvToRgb(colHSV[0], colHSV[1], colHSV[2]);
+		var newRGB = [ colRGB[0] + Number(xLeds[ledPos].r), colRGB[1] + Number(xLeds[ledPos].g), colRGB[2] + Number(xLeds[ledPos].b) ];
+		xLeds[ledPos] = { r:newRGB[0], g:newRGB[1], b:newRGB[2] };
+	});
+
+	// correct overflows (R or G or B > 255)
+	xLeds.forEach(function(item, index){
+		if( item.r > 255 || item.g > 255 || item.b > 255 ){
+			if(item.r >= item.g && item.r >= item.b){
+				var xDivisor = item.r / 255;
+			} else if(item.g >= item.r && item.g >= item.b){
+				var xDivisor = item.g / 255;
+			} else if(item.b >= item.r && item.b >= item.g){
+				var xDivisor = item.b / 255;
+			}
+			var xRGB = [ Math.round(item.r / xDivisor), Math.round(item.g / xDivisor), Math.round(item.b / xDivisor) ];
+			xLeds[index] = {r:xRGB[0], g:xRGB[1], b:xRGB[2]};
+		}
+	});
+	
+	ledFrames[frameNr] = xLeds.slice(0);
+
 }

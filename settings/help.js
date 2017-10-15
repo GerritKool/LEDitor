@@ -5,12 +5,14 @@ function showHelp(obj, event){
 		typeof selectedGenerator === "undefined" ||
 		typeof colorPickerOn === "undefined" ||
 		typeof enableAniCopy === "undefined" ||
-		typeof colorSelectType === "undefined"
+		typeof colorSelectType === "undefined" ||
+		animationIndex[selectedAnimation] === undefined
 		){return;}
 
 	var	docHelp = document.getElementById('helpInfoArea'),
 		id = obj.id,
 		idNumber = '';
+
 
 	if(selectedGenerator >=0){
 		var	genName = generatorParameters[selectedGenerator].generator.substr(8).toLowerCase(),
@@ -78,6 +80,18 @@ function showHelp(obj, event){
 
 	switch(event.type){
 		case'mouseover':
+
+			//**** Hide options menu ****
+			if(	id != 'but_editor_leds' &&
+				id != 'but_editor_generator' &&
+				id != 'but_editor_randomizer' &&
+				id != 'but_select_editor'
+			){ menu_select_editor.style.visibility = 'hidden'; }
+			//**** Show options menu ****
+			if( id == 'but_select_editor' ){ menu_select_editor.style.visibility = 'visible'; }
+
+
+
 			if(!settingControlInfo.checked){return;}
 			docHelp.style.fontWeight = '600';
 			docHelp.style.color = '#400000';
@@ -186,6 +200,7 @@ function showHelp(obj, event){
 			} else {
 				var txtHelpDefault = thisApp.helpText['Default'];
 			}
+
 			docHelp.style.fontWeight = 'normal';
 			docHelp.style.color = document.body.style.color;
 			docHelp.innerHTML = txtHelpDefault;
