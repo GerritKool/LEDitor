@@ -2,9 +2,10 @@
  "settings": {
 	"intro": "offers the possibility to create customized LED Ring animations. The animations can be selected with flow cards and played for an adjustable time.",
 	"header_editor": "LED editor",
+	"header_generator": "Animation generator",
+	"header_randomizer": "Randomizer",
 	"header_frame": "&nbsp;Frame",
 	"header_colors": "&nbsp;Color pattern",
-	"header_generator": "Animation generator",
 	"header_export": "Save LEDitor animation",
 	"header_settings": "LEDitor settings",
 	"txt_empty_preset": "New",
@@ -14,6 +15,7 @@
 	"title_but_rename_ani": "Rename",
 	"title_butPlay": "Play on screen",
 	"title_butPreview": "Play on LED ring",
+	"title_but_view_frames": "Change display type",
 
 	"title_but_ani_store": "Save LEDitor animation",
 	"title_but_ani_open": "Open LEDitor animation",
@@ -24,8 +26,9 @@
 	"title_but_ani_fill_connect": "Fill empty frames smoothly. Variable position",
 	"title_but_ani_delete": "Clear this animation",
 
-	"title_but_ani_generator": "Animation generator",
-	"title_but_generator_close": "Return to editor",
+	"title_but_editor_generator": "Animation generator",
+	"title_but_editor_leds": "LED editor",
+	"title_but_editor_randomizer": "Randomizer",
 
 	"title_but_frame_clock": "Move clockwise",
 	"title_but_frame_counterclock": "Move counterclockwise",
@@ -47,11 +50,16 @@
 	"title_but_edit_redo": "Redo",
 
 	"title_but_open_image": "Open an image",
+	"title_but_view_import": "Change display type",
 	"title_but_scan_direction": "Scan direction",
 	"title_but_import_cancel": "Cancel",
 	"title_but_import_accept": "Accept",
 
+	"txt_view_colors": "Pixel display",
+	"txt_view_led": "LED display",
+	"txt_view_ledring": "Ring display",
 	"txt_check_all_frames": "All frames",
+	"txt_check_each_led": "Each LED",
 
 
 	"frame_count": "Frames",
@@ -110,7 +118,7 @@
 	"txt_ledring": "LED ring display is approximate",
 
 	"txt_import_start": "Start here and open an image.",
-	"txt_led_colors": "Imported colors",
+	"txt_led_colors": "Imported frames",
 	"txt_image_selection": "Image selection",
 	"txt_dimmer": "Dimmer",
 	"txt_hue": "Hue",
@@ -143,8 +151,13 @@
 	"txt_generator_17": "Gort",
 	"txt_generator_18": "Eyes",
 
+	"txt_randomizer_hue": "Hue randomly",
+	"txt_randomizer_sat": "Saturation randomly",
+	"txt_randomizer_bright": "Brightness randomly",
+	"txt_randomizer_position": "Position randomly",
+
 	"txt_settings_gamma": "Gamma for on-screen LED colors",
-	"txt_settings_show_info": "Show control information",
+	"txt_settings_show_info": "Show header and control information",
 	"txt_settings_show_homey": "Show LED operations on Homeys LED Ring",
 	"txt_settings_show_homey_time_pre": "for",
 	"txt_settings_show_homey_time_post": "seconds",
@@ -152,6 +165,7 @@
 	"message_load_animation": "Loading animation...",
 	"message_prepare_animation": "Preparing on-screen animation...",
 	"message_send_animation": "Sending animation to Homey...",
+	"message_open_image": "The image is being read...",
 
 	"help_but_copy_ani_A": "Activate Copy mode to replace the selected animation with a copy of the subsequent selection. <br> Example: Select animation 1, activate Copy mode, choose animation 3. Animation 1 is now replaced with a copy of animation 3.",
 	"help_but_copy_ani_B": "Deactivate Copy mode.",
@@ -165,7 +179,8 @@
 	"help_butPlay": "Play an example animation on the screen. This may be useful when Homey is unavailable. This display is only approximately the same as the actual LED ring display.",
 	"help_butPreview": "Play the animation with Homey. You can optionally set a number of repetitions so the transition from the end to the beginning of the animation becomes clearly visible.",
 	"help_inRepeat": "How many times should Homey repeat the animation test.",
-	"help_tableFrames": "This is a view of the frames. Larger markers show LEDs 1 (front), 7 (left), 13 (rear) and 19 (right). LED 1 is visible in the center while LED 13 is visible both left and right on the bar to emphasize the circular reality. Select a frame to see the ring view and make any adjustments.",
+	"help_tableFrames": "This is a display of the frames. Larger markers show LEDs 1 (front), 7 (left), 13 (rear) and 19 (right). LED 1 is visible in the center while LED 13 is visible both left and right on the bar to emphasize the circular reality. Select a frame to see the ring view and make any adjustments.",
+	"help_but_view_frames": "Select a type of display for the list of frames. 'Pixel display' = Simple colors. 'LED display' = Light-related, with the brightness difference between the individual LEDs clearly visible. 'Ring display' = Related to the LED Ring, with the final result being reasonably well visible.",
 
 	"help_butTopColor": "Choose a background color for the screen views. Possible are black, 33% gray, 66% gray and white. This can help to better recognize very dark or very bright, near-white colors.",
 	"help_ledMarker_A": "Perform operation. Move your mouse over these LED markers to see which LEDs will be edited with the current setting. Click on a marker to perform the selected operation.",
@@ -193,8 +208,9 @@
 	"help_but_ani_store": "Save LEDitor animation #1# (#2#). It is saved as a PNG image and contains the animation name and settings for FPS, VFPS, and RPM in addition to the colors for the LEDs. These images can be used as backup and shared with other users.",
 	"help_but_export_cancel": "Leave animation export and return to the editor.",
 
-	"help_but_ani_generator": "With the animation generator you can generate an LED ring animation by a few mouse clicks. You can choose from all the patterns of the 'LED Ring Collection' and set the colors and a number of parameters.",
-	"help_but_generator_close": "Return to the LED ring editor for manual adjustments.",
+	"help_but_editor_randomizer": "Change hue, saturation, brightness and position of active LEDs randomly. The maximum changes are adjustable from very subtle to fully chaotic.",
+	"help_but_editor_generator": "With the animation generator you can generate an LED ring animation by a few mouse clicks. You can choose from all the patterns of the 'LED Ring Collection' and set the colors and a number of parameters.",
+	"help_but_editor_leds": "Use the LED ring editor for manual adjustments of the LEDs. Use functions to rotate and fill a frame.",
 	"help_but_frame_add": "Add a new frame after the selected frame.",
 	"help_but_frame_copy": "Add a copy after the selected frame.",
 	"help_but_ani_fill_flow": "Frames without active LEDs are filled with a gradient composed of the colors of the adjacent frames with active LEDs.",
@@ -204,17 +220,18 @@
 	"help_but_edit_undo": "Undo the last edit. This is possible until you select another animation or leave this settings page.",
 	"help_but_edit_redo": "Redo the undone edit. This is possible until you select another animation or leave this settings page.",
 
+	"help_but_view_frames": "Select a type of display for the list of imported frames. 'Pixel display' = Simple colors. 'LED display' = Light-related, with the brightness difference between the individual LEDs clearly visible. 'Ring display' = Related to the LED Ring, with the final result being reasonably well visible.",
 	"help_sliderDimmer": "Use Dimmer to darken the original colors. This prevents adjacent colors from mixing too much, which can result in a boring, almost white-lit LED ring. Use your mouse wheel or cursor keys for fine tuning. A double-click sets the default value.",
 	"help_sliderHue": "Hue allows you to customize the color spectrum of an image. Use your mouse wheel or cursor keys for fine tuning. A double-click sets the default value.",
 	"help_sliderSaturation": "Use Saturation to make dull colors brighter and vice versa. Use the minimum setting for grayscale / white levels. Use your mouse wheel or cursor keys for fine tuning. A double-click sets the default value.",
-	"help_sliderLightness": "Lightness makes the colors darker or brighter. Dark shades are more affected than light shades. Use your mouse wheel or cursor keys for fine tuning. A double-click sets the default value.",
+	"help_sliderLightness": "Lightness makes the colors darker or brighter, somewhat similar to contrast control. Use your mouse wheel or cursor keys for fine tuning. A double-click sets the default value.",
 	"help_sliderZoom": "Use Zoom to increase a particular part of an image. The last mouse click in an image determines the center of magnification. Use your mouse wheel or cursor keys for fine tuning. A double click shows the full image.",
 	"help_but_open_image": "Open an image as a source for frames and LED colors.",
 	"help_but_scan_direction": "Select whether the frames are scanned from left to right, or from top to bottom.",
 	"help_inFrames": "Determine the number of frames in which the selection is divided.",
 	"help_canvImage": "Click on the image to determine the center of the part to be used. This is also the point that may be zoomed in.",
 	"help_importArea": "This image area is used to import the frames and colors and also displays the gamma correction for display / LEDs and any manual color adjustments. Move the mouse in the longitudinal direction to view the frames in the matrix view.",
-	"help_canvImportedFrames": "Here you will see how the colors from an image are used in frames. Frames are displayed from top to bottom. Each frame displays 24 LED colors from left to right. Disabled LEDs are displayed with a dot. The central vertical marker shows the position of LED 1.",
+	"help_canvImportedFrames": "Here you will see how the colors from an image are used in frames. Frames are displayed from top to bottom. Each frame displays 24 LED colors from left to right. The central vertical marker shows the position of LED 1.",
 	"help_but_import_cancel": "Return to the editor without importing the image. As long as you do not leave the LEDitor settings, you can return here to continue working with the current image.",
 	"help_but_import_accept": "Accept the displayed settings. Animation #1# (#2) will be erased and replaced by the chosen image frames. As long as you do not leave the LEDitor settings, you can return here to make adjustments.",
 
@@ -229,6 +246,16 @@
 	"help_inGenFrame": "How many frames will be used for the animation.",
 	"help_inGenFrame_number": "The recommended settings for this generator are #1# frames for 1 color, #2# frames for a 2 color gradient and #3# frames for a full gradient.",
 	"help_inGenFrame_number1": "The recommended setting for this generator is #1# frames.",
+
+	"help_sliderRandomizerHue": "Set the range of the random hue change. Example: At a setting of '60&deg; +/-', a yellow LED (60&deg;) can change to any color from red (0&deg;) to green (120&deg;). At a setting of '180&deg; +/-' random hues from the full color spectrum are assigned to the active LEDs.",
+	"help_sliderRandomizerSat": "Set the range of random saturation change. Example: At a setting of '20% +/-', an LED with a saturation of 50% can change to any saturation from 30% to 70%. At a setting of '100% +/-', random values from pure white to full color are assigned to the active LEDs.",
+	"help_sliderRandomizerBright": "Set the range of random brightness change. Example: At a setting of '20% +/-', an LED with a brightness of 50% can change to any brightness from 30% to 70%. At a setting of '100% +/-', random values from 'off' to full brightness are assigned to the active LEDs.",
+	"help_sliderRandomizerPosition": "Set the range of the random position change. With a value of '12 +/- ', all positions are possible.",
+	"help_but_randomizer_accept": "Apply the above settings according to the LED and frame permissions listed on the right.",
+	"help_checkAllFramesRandomizer": "Check this option to apply the settings to all frames. Normally, only the selected frame is edited.",
+	"help_checkEachLedRandomizer": "Check this option to apply the settings to each individual LED. Normally, all LEDs in a frame are edited equally.",
+
+	"help_but_select_editor": "",
 
 	"help_but_color_select_type0": "Choose the advanced color selection. Here you can set tint, saturation and brightness of a color very accurately. This makes it possible to choose from more than 3 million color tones.",
 	"help_but_color_select_type1": "Choose the color palette to quickly select from 475 color tones.",

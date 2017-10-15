@@ -2,9 +2,10 @@
  "settings": {
 	"intro": "biedt de mogelijkheid om eigen LED Ring animaties te maken. De animaties kunnen met flow-kaarten geselecteerd worden en gedurende een instelbare tijd worden afgespeeld.",
 	"header_editor": "LED editor",
+	"header_generator": "Animatie generator",
+	"header_randomizer": "Randomizer",
 	"header_frame": "&nbsp;Frame",
 	"header_colors": "&nbsp;Kleur patroon",
-	"header_generator": "Animatie generator",
 	"header_export": "Bewaar LEDitor animatie",
 	"header_settings": "LEDitor instellingen",
 	"txt_empty_preset": "Nieuw",
@@ -14,6 +15,7 @@
 	"title_but_rename_ani": "Hernoem",
 	"title_butPlay": "Afspelen op het beeldscherm",
 	"title_butPreview": "Afspelen op de LED-ring",
+	"title_but_view_frames": "Wissel weergave type",
 
 	"title_but_ani_store": "Bewaar een LEDitor animatie.",
 	"title_but_ani_open": "Open een LEDitor animatie.",
@@ -24,8 +26,9 @@
 	"title_but_ani_fill_connect": "Lege frames vullen met kleurverloop. Variabele positie.",
 	"title_but_ani_delete": "Wis deze animatie",
 
-	"title_but_ani_generator": "Animatie generator",
-	"title_but_generator_close": "Keer terug naar de editor",
+	"title_but_editor_generator": "Animatie generator",
+	"title_but_editor_leds": "LED editor",
+	"title_but_editor_randomizer": "Randomizer",
 
 	"title_but_frame_clock": "Met de klok mee verplaatsen",
 	"title_but_frame_counterclock": "Tegen de klok in verplaatsen",
@@ -47,11 +50,16 @@
 	"title_but_edit_redo": "Opnieuw bewerken",
 
 	"title_but_open_image": "Open een afbeelding",
+	"title_but_view_import": "Wissel weergave type",
 	"title_but_scan_direction": "Scanrichting",
 	"title_but_import_cancel": "Annuleer",
 	"title_but_import_accept": "Accepteer",
 
+	"txt_view_colors": "Pixel weergave",
+	"txt_view_led": "LED weergave",
+	"txt_view_ledring": "Ring weergave",
 	"txt_check_all_frames": "Alle frames",
+	"txt_check_each_led": "Elke LED",
 
 	"frame_count": "Frames",
 	"txt_move_up": "Verplaats omhoog",
@@ -109,7 +117,7 @@
 	"txt_ledring": "LED-ring weergave is bij benadering",
 
 	"txt_import_start": "Begin hier en open een afbeelding.",
-	"txt_led_colors": "Ge&iuml;mporteerde kleuren",
+	"txt_led_colors": "Ge&iuml;mporteerde frames",
 	"txt_image_selection": "Afbeelding selectie",
 	"txt_dimmer": "Dimmer",
 	"txt_hue": "Tint",
@@ -143,8 +151,13 @@
 	"txt_generator_17": "Gort",
 	"txt_generator_18": "Ogen",
 
+	"txt_randomizer_hue": "Tint willekeurig",
+	"txt_randomizer_sat": "Verzadiging willekeurig",
+	"txt_randomizer_bright": "Helderheid willekeurig",
+	"txt_randomizer_position": "Positie willekeurig",
+
 	"txt_settings_gamma": "Gamma voor LED kleuren op het scherm",
-	"txt_settings_show_info": "Toon bedienings informatie",
+	"txt_settings_show_info": "Toon koptekst en bedieningsinformatie",
 	"txt_settings_show_homey": "Toon LED bewerkingen op Homeys LED-Ring",
 	"txt_settings_show_homey_time_pre": "gedurende",
 	"txt_settings_show_homey_time_post": "seconden",
@@ -152,6 +165,7 @@
 	"message_load_animation": "Animatie openen...",
 	"message_prepare_animation": "Beeldscherm animatie voorbereiden...",
 	"message_send_animation": "Animatie naar Homey sturen...",
+	"message_open_image": "De afbeelding wordt ingelezen...",
 
 	"help_but_copy_ani_A": "Activeer kopie modus om de geselecteerde animatie te vervangen door een kopie van de opvolgende selectie.<br>Voorbeeld: Kies animatie 1, activeer kopie-modus, kies animatie 3. Animatie 1 wordt nu vervangen door een kopie van animatie 3.",
 	"help_but_copy_ani_B": "Deactiveer kopie modus.",
@@ -166,6 +180,7 @@
 	"help_butPreview": "Speel de animatie met Homey. Je kunt eventueel een aantal herhalingen instellen zodat de overgang van het einde naar het begin van de animatie duidelijk zichtbaar wordt.",
 	"help_inRepeat": "Hoeveel keer moet Homey de test animatie herhalen.",
 	"help_tableFrames": "Dit is een weergave van de frames. Grotere markeringen tonen LED's 1 (front), 7 (links), 13 (achter) en 19 (rechts). LED 1 is in het midden zichtbaar terwijl LED 13 zowel links als rechts op de balk zichtbaar is om de cirkelvormige werkelijkheid te benadrukken. Selecteer een frame om in de ring-weergave te bekijken en eventueel aanpassingen te doen.",
+	"help_but_view_frames": "Selecteer een type weergave voor de lijst met frames. 'Pixel weergave' = Simpele kleurweergave. 'LED weergave' = Aan licht gerelateerd, waarbij het helderheidsverschil tussen de individuele LED's duidelijk zichtbaar is. 'Ring weergave' = Gerelateerd aan de LED Ring, waarbij het uiteindelijke resultaat redelijk goed zichtbaar wordt.",
 
 	"help_butTopColor": "Kies een achtergrondkleur voor de schermweergaves. Mogelijk zijn zwart, 33% grijs, 66% grijs en wit. Dit kan helpen voor een betere herkenning van erg donkere of zeer felle, wit-achtige kleuren.",
 	"help_ledMarker_A": "Bewerking uitvoeren. Beweeg de muis over deze LED markeringen om te zien welke LED's met de huidige instelling worden bewerkt. Klik op een markering om de ingestelde bewerking uit te voeren.",
@@ -193,8 +208,9 @@
 	"help_but_ani_store": "Bewaar LEDitor animatie #1# (#2#). Deze wordt opgeslagen als PNG-afbeelding en bevat behalve de kleuren voor de LED's ook de animatie-naam en de instellingen voor FPS, VFPS en RPM. Deze afbeeldingen kunnen worden gebruikt als back-up en met andere gebruikers worden gedeeld.",
 	"help_but_export_cancel": "Verlaat animatie export en keer terug naar de editor.",
 
-	"help_but_ani_generator": "Met de animatiegenerator kun je met een paar muisklikken een LED-ring animatie genereren. Je kunt kiezen uit alle patronen van de 'LED-Ring Collection' en zelf de kleuren en een aantal parameters instellen.",
-	"help_but_generator_close": "Keer terug naar de LED-ring editor voor handmatige aanpassingen.",
+	"help_but_editor_randomizer": "Wijzig tint, verzadiging, helderheid en positie van actieve LED's willekeurig. De maximum wijzigingen zijn instelbaar van zeer subtiel tot en met volledig chaotisch.",
+	"help_but_editor_generator": "Met de animatiegenerator kun je met een paar muisklikken een LED-ring animatie genereren. Je kunt kiezen uit alle patronen van de 'LED-Ring Collection' en zelf de kleuren en een aantal parameters instellen.",
+	"help_but_editor_leds": "Gebruik de LED-ring editor voor handmatige bewerkingen van de LED's. Maak daarbij gebruik van functies om een frame te roteren en te vullen.",
 	"help_but_frame_add": "Een nieuw frame toevoegen na het geselecteerde frame.",
 	"help_but_frame_copy": "Een kopie toevoegen na het geselecteerde frame.",
 	"help_but_ani_fill_flow": "Frames zonder actieve LED's worden gevuld met een kleurverloop dat wordt samengesteld uit de kleuren van de naastliggende frames met actieve LED's.",
@@ -204,17 +220,18 @@
 	"help_but_edit_undo": "Maak de laatste bewerking ongedaan. Dit is mogelijk totdat je een andere animatie selecteert of deze instellingen-pagina verlaat.",
 	"help_but_edit_redo": "Voer de ongedaan gemaakte bewerking opnieuw uit. Dit is mogelijk totdat je een andere animatie selecteert of deze instellingen-pagina verlaat.",
 
+	"help_but_view_import": "Selecteer een type weergave voor de lijst met ge&iuml;mporteerde frames. 'Pixel weergave' = Simpele kleurweergave. 'LED weergave' = Aan licht gerelateerd, waarbij het helderheidsverschil tussen de individuele LED's duidelijk zichtbaar is. 'Ring weergave' = Gerelateerd aan de LED Ring, waarbij het uiteindelijke resultaat redelijk goed zichtbaar wordt.",
 	"help_sliderDimmer": "Gebruik Dimmer om de oorspronkelijke kleuren donkerder te maken. Dit voorkomt dat aangrenzende kleuren teveel met elkaar mengen, wat kan resulteren in een saaie bijna wit oplichtende LED-ring. Gebruik je muiswiel of cursortoetsen voor de fijnafstelling. Een dubbelklik stelt de standaardwaarde in.",
 	"help_sliderHue": "Met Tint kun je het kleurenspectrum van een afbeelding aanpassen. Gebruik je muiswiel of cursortoetsen voor de fijnafstelling. Een dubbelklik stelt de standaardwaarde in.",
 	"help_sliderSaturation": "Gebruik Verzadiging om doffe kleuren helderder te maken en vice versa. Gebruik de minimale instelling voor grijstinten / wit-niveau's. Gebruik je muiswiel of cursortoetsen voor de fijnafstelling. Een dubbelklik stelt de standaardwaarde in.",
-	"help_sliderLightness": "Met Lichtheid worden de kleuren donkerder of feller gemaakt. Hierbij worden donkere tinten meer be&iuml;nvloed dan lichte tinten. Gebruik je muiswiel of cursortoetsen voor de fijnafstelling. Een dubbelklik stelt de standaardwaarde in.",
+	"help_sliderLightness": "Met Lichtheid worden de kleuren donkerder of feller gemaakt, enigszins vergelijkbaar met een contrastregeling. Gebruik je muiswiel of cursortoetsen voor de fijnafstelling. Een dubbelklik stelt de standaardwaarde in.",
 	"help_sliderZoom": "Gebruik Zoom om een bepaald deel van een afbeelding te vergroten. De laatste muisklik in een afbeelding bepaalt het centrum van de vergroting. Gebruik je muiswiel of cursortoetsen voor de fijnafstelling. Een dubbelklik toont de volledige afbeelding.",
 	"help_but_open_image": "Open een afbeelding als bron voor frames en LED-kleuren.",
 	"help_but_scan_direction": "Selecteer of de frames van links naar rechts, of van boven naar onder worden ingescand.",
 	"help_inFrames": "Bepaal het aantal frames waarin de selectie wordt opgedeeld.",
 	"help_canvImage": "Klik op de afbeelding om het middelpunt van het te gebruiken deel te bepalen. Dit is tevens het punt waarop eventueel wordt ingezoomd.",
 	"help_importArea": "Dit deel van de afbeelding wordt gebruikt om de frames en kleuren te importeren en toont tevens de gamma correctie voor beeldscherm / LED's en eventuele handmatige kleuraanpassingen. Beweeg de muis in de lengte-richting om de frames in de matrix-weergave te bekijken.",
-	"help_canvImportedFrames": "Hier zie je hoe de kleuren uit een afbeelding in frames worden gebruikt. Frames worden van boven naar onder weergegeven. Per frame worden de 24 LED-kleuren van links naar rechts afgebeeld. Uitgeschakelde LED's worden weergegeven met een punt. De centrale verticale markering toont de positie van LED 1.",
+	"help_canvImportedFrames": "Hier zie je hoe de kleuren uit een afbeelding in frames worden gebruikt. Frames worden van boven naar onder weergegeven. Per frame worden de 24 LED-kleuren van links naar rechts afgebeeld. De centrale verticale markering toont de positie van LED 1.",
 	"help_but_import_cancel": "Keer terug naar de editor zonder de afbeelding te importeren. Zolang je de LEDitor-instellingen niet verlaat, kun je hier terugkeren om verder te werken met de huidige afbeelding.",
 	"help_but_import_accept": "Accepteer de weergegeven instellingen. Animatie #1# (#2#) zal worden vervangen door de gekozen afbeelding frames. Zolang je de LEDitor-instellingen niet verlaat, kun je hier terugkeren om aanpassingen te doen.",
 
@@ -229,6 +246,16 @@
 	"help_inGenFrame": "Hoeveel frames worden er gebruikt voor de animatie.",
 	"help_inGenFrame_number": "De aanbevolen instellingen voor deze generator zijn #1# frames voor 1 kleur, #2# frames voor een 2 kleuren verloop en #3# frames voor een volledig verloop.",
 	"help_inGenFrame_number1": "De aanbevolen instelling voor deze generator is #1# frames.",
+
+	"help_sliderRandomizerHue": "Stel het bereik van de willekeurige tint verandering in. Voorbeeld: Bij een instelling van '60&deg; +/-', zal een gele LED (60&deg;) kunnen veranderen in een willekeurige kleur tussen rood (0&deg;) en groen (120&deg;). Bij een instelling van '180&deg; +/-' worden willekeurige tinten uit het volledige kleurspectrum toegekend aan de actieve LED's.",
+	"help_sliderRandomizerSat": "Stel het bereik van de willekeurige verzadiging verandering in. Voorbeeld: Bij een instelling van '20% +/-', zal een LED met een verzadiging van 50% kunnen veranderen in een willekeurige verzadiging van 30% tot en met 70%. Bij een instelling van '100% +/-' worden willekeurige waardes van puur wit tot en met volledig gekleurd toegekend.",
+	"help_sliderRandomizerBright": "Stel het bereik van de willekeurige helderheid verandering in. Voorbeeld: Bij een instelling van '20% +/-' zal een LED met een helderheid van 50% kunnen veranderen in een willekeurige helderheid van 30% tot en met 70%. Bij een instelling van '100% +/-' worden willekeurige waardes van 'uit' tot en met maximale helderheid toegekend.",
+	"help_sliderRandomizerPosition": "Stel het bereik van de willekeurige positie verandering in. Bij een waarde van '12 +/-' zijn alle posities mogelijk.",
+	"help_but_randomizer_accept": "Pas de bovenstaande instellingen toe volgens de hiernaast ingesteld LED en frame permissies.",
+	"help_checkAllFramesRandomizer": "Vink deze optie aan, om de instellingen op alle frames toe te passen. Normaal wordt alleen het geselecteerde frame bewerkt.",
+	"help_checkEachLedRandomizer": "Vink deze optie aan, om de instellingen op iedere individuele LED toe te passen. Normaal worden alle LED's in een frame gelijkwaardig bewerkt.",
+
+	"help_but_select_editor": "Selecteer het type editor dat je wilt gebruiken.",
 
 	"help_but_color_select_type0": "Kies de geavanceerde kleurselectie. Hier kun je tint, verzadiging en helderheid van een kleur zeer nauwkeurig instellen. Hierdoor is het mogelijk om uit ruim 3 miljoen kleurtinten te kiezen.",
 	"help_but_color_select_type1": "Kies het kleurenpalet om snel een keuze te maken uit 475 kleurtinten.",
